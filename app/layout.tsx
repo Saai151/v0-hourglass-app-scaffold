@@ -7,8 +7,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
+  title: 'Hourglass - AI Meeting Ops Assistant',
+  description: 'Reclaim your calendar with AI-powered meeting management. Hourglass audits your meetings, suggests optimizations, and executes actions with your approval.',
   generator: 'v0.app',
   icons: {
     icon: [
