@@ -5,9 +5,35 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ==========================================
+-- DROP EXISTING TYPES IF THEY EXIST (for clean re-runs)
+-- ==========================================
+DO $$ BEGIN
+  DROP TYPE IF EXISTS provider_type CASCADE;
+  DROP TYPE IF EXISTS connection_status CASCADE;
+  DROP TYPE IF EXISTS audit_verdict CASCADE;
+  DROP TYPE IF EXISTS audit_status CASCADE;
+  DROP TYPE IF EXISTS approval_channel CASCADE;
+  DROP TYPE IF EXISTS execution_status CASCADE;
+  DROP TYPE IF EXISTS delivery_channel CASCADE;
+  DROP TYPE IF EXISTS delivery_status CASCADE;
+EXCEPTION WHEN OTHERS THEN NULL;
+END $$;
+
+-- ==========================================
+-- CREATE ENUM TYPES
+-- ==========================================
+CREATE TYPE provider_type AS ENUM ('gmail', 'google_calendar', 'slack', 'whatsapp');
+CREATE TYPE connection_status AS ENUM ('connected', 'disconnected', 'error', 'pending');
+CREATE TYPE audit_verdict AS ENUM ('keep', 'shorten', 'asyncify', 'delegate', 'cancel', 'needs_context');
+CREATE TYPE audit_status AS ENUM ('pending', 'approved', 'rejected', 'executed', 'expired');
+CREATE TYPE approval_channel AS ENUM ('web', 'whatsapp', 'slack');
+CREATE TYPE execution_status AS ENUM ('pending', 'success', 'failed');
+CREATE TYPE delivery_channel AS ENUM ('web', 'whatsapp');
+CREATE TYPE delivery_status AS ENUM ('pending', 'sent', 'delivered', 'failed', 'responded');
+
+-- ==========================================
 -- PROFILES TABLE
 -- ==========================================
--- Extends auth.users with application-specific user data
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   full_name TEXT,
@@ -21,6 +47,11 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 );
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "profiles_select_own" ON public.profiles;
+DROP POLICY IF EXISTS "profiles_insert_own" ON public.profiles;
+DROP POLICY IF EXISTS "profiles_update_own" ON public.profiles;
+DROP POLICY IF EXISTS "profiles_delete_own" ON public.profiles;
 
 CREATE POLICY "profiles_select_own" ON public.profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "profiles_insert_own" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
@@ -45,6 +76,11 @@ CREATE TABLE IF NOT EXISTS public.user_preferences (
 
 ALTER TABLE public.user_preferences ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "user_preferences_select_own" ON public.user_preferences;
+DROP POLICY IF EXISTS "user_preferences_insert_own" ON public.user_preferences;
+DROP POLICY IF EXISTS "user_preferences_update_own" ON public.user_preferences;
+DROP POLICY IF EXISTS "user_preferences_delete_own" ON public.user_preferences;
+
 CREATE POLICY "user_preferences_select_own" ON public.user_preferences FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "user_preferences_insert_own" ON public.user_preferences FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "user_preferences_update_own" ON public.user_preferences FOR UPDATE USING (auth.uid() = user_id);
@@ -53,9 +89,6 @@ CREATE POLICY "user_preferences_delete_own" ON public.user_preferences FOR DELET
 -- ==========================================
 -- CONNECTED ACCOUNTS TABLE
 -- ==========================================
-CREATE TYPE provider_type AS ENUM ('gmail', 'google_calendar', 'slack', 'whatsapp');
-CREATE TYPE connection_status AS ENUM ('connected', 'disconnected', 'error', 'pending');
-
 CREATE TABLE IF NOT EXISTS public.connected_accounts (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -73,10 +106,15 @@ CREATE TABLE IF NOT EXISTS public.connected_accounts (
   UNIQUE(user_id, provider)
 );
 
-CREATE INDEX idx_connected_accounts_user_id ON public.connected_accounts(user_id);
-CREATE INDEX idx_connected_accounts_provider ON public.connected_accounts(provider);
+CREATE INDEX IF NOT EXISTS idx_connected_accounts_user_id ON public.connected_accounts(user_id);
+CREATE INDEX IF NOT EXISTS idx_connected_accounts_provider ON public.connected_accounts(provider);
 
 ALTER TABLE public.connected_accounts ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "connected_accounts_select_own" ON public.connected_accounts;
+DROP POLICY IF EXISTS "connected_accounts_insert_own" ON public.connected_accounts;
+DROP POLICY IF EXISTS "connected_accounts_update_own" ON public.connected_accounts;
+DROP POLICY IF EXISTS "connected_accounts_delete_own" ON public.connected_accounts;
 
 CREATE POLICY "connected_accounts_select_own" ON public.connected_accounts FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "connected_accounts_insert_own" ON public.connected_accounts FOR INSERT WITH CHECK (auth.uid() = user_id);
@@ -104,11 +142,16 @@ CREATE TABLE IF NOT EXISTS public.calendar_events (
   UNIQUE(user_id, provider_event_id)
 );
 
-CREATE INDEX idx_calendar_events_user_id ON public.calendar_events(user_id);
-CREATE INDEX idx_calendar_events_start_time ON public.calendar_events(start_time);
-CREATE INDEX idx_calendar_events_is_external ON public.calendar_events(is_external);
+CREATE INDEX IF NOT EXISTS idx_calendar_events_user_id ON public.calendar_events(user_id);
+CREATE INDEX IF NOT EXISTS idx_calendar_events_start_time ON public.calendar_events(start_time);
+CREATE INDEX IF NOT EXISTS idx_calendar_events_is_external ON public.calendar_events(is_external);
 
 ALTER TABLE public.calendar_events ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "calendar_events_select_own" ON public.calendar_events;
+DROP POLICY IF EXISTS "calendar_events_insert_own" ON public.calendar_events;
+DROP POLICY IF EXISTS "calendar_events_update_own" ON public.calendar_events;
+DROP POLICY IF EXISTS "calendar_events_delete_own" ON public.calendar_events;
 
 CREATE POLICY "calendar_events_select_own" ON public.calendar_events FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "calendar_events_insert_own" ON public.calendar_events FOR INSERT WITH CHECK (auth.uid() = user_id);
@@ -132,9 +175,14 @@ CREATE TABLE IF NOT EXISTS public.meeting_contexts (
   UNIQUE(calendar_event_id)
 );
 
-CREATE INDEX idx_meeting_contexts_calendar_event_id ON public.meeting_contexts(calendar_event_id);
+CREATE INDEX IF NOT EXISTS idx_meeting_contexts_calendar_event_id ON public.meeting_contexts(calendar_event_id);
 
 ALTER TABLE public.meeting_contexts ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "meeting_contexts_select_own" ON public.meeting_contexts;
+DROP POLICY IF EXISTS "meeting_contexts_insert_own" ON public.meeting_contexts;
+DROP POLICY IF EXISTS "meeting_contexts_update_own" ON public.meeting_contexts;
+DROP POLICY IF EXISTS "meeting_contexts_delete_own" ON public.meeting_contexts;
 
 CREATE POLICY "meeting_contexts_select_own" ON public.meeting_contexts FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "meeting_contexts_insert_own" ON public.meeting_contexts FOR INSERT WITH CHECK (auth.uid() = user_id);
@@ -144,10 +192,6 @@ CREATE POLICY "meeting_contexts_delete_own" ON public.meeting_contexts FOR DELET
 -- ==========================================
 -- MEETING AUDITS TABLE
 -- ==========================================
-CREATE TYPE audit_verdict AS ENUM ('keep', 'shorten', 'asyncify', 'delegate', 'cancel', 'needs_context');
-CREATE TYPE audit_status AS ENUM ('pending', 'approved', 'rejected', 'executed', 'expired');
-CREATE TYPE approval_channel AS ENUM ('web', 'whatsapp', 'slack');
-
 CREATE TABLE IF NOT EXISTS public.meeting_audits (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -168,11 +212,16 @@ CREATE TABLE IF NOT EXISTS public.meeting_audits (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_meeting_audits_user_id ON public.meeting_audits(user_id);
-CREATE INDEX idx_meeting_audits_status ON public.meeting_audits(status);
-CREATE INDEX idx_meeting_audits_calendar_event_id ON public.meeting_audits(calendar_event_id);
+CREATE INDEX IF NOT EXISTS idx_meeting_audits_user_id ON public.meeting_audits(user_id);
+CREATE INDEX IF NOT EXISTS idx_meeting_audits_status ON public.meeting_audits(status);
+CREATE INDEX IF NOT EXISTS idx_meeting_audits_calendar_event_id ON public.meeting_audits(calendar_event_id);
 
 ALTER TABLE public.meeting_audits ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "meeting_audits_select_own" ON public.meeting_audits;
+DROP POLICY IF EXISTS "meeting_audits_insert_own" ON public.meeting_audits;
+DROP POLICY IF EXISTS "meeting_audits_update_own" ON public.meeting_audits;
+DROP POLICY IF EXISTS "meeting_audits_delete_own" ON public.meeting_audits;
 
 CREATE POLICY "meeting_audits_select_own" ON public.meeting_audits FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "meeting_audits_insert_own" ON public.meeting_audits FOR INSERT WITH CHECK (auth.uid() = user_id);
@@ -182,8 +231,6 @@ CREATE POLICY "meeting_audits_delete_own" ON public.meeting_audits FOR DELETE US
 -- ==========================================
 -- EXECUTIONS TABLE
 -- ==========================================
-CREATE TYPE execution_status AS ENUM ('pending', 'success', 'failed');
-
 CREATE TABLE IF NOT EXISTS public.executions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   meeting_audit_id UUID NOT NULL REFERENCES public.meeting_audits(id) ON DELETE CASCADE,
@@ -196,11 +243,14 @@ CREATE TABLE IF NOT EXISTS public.executions (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_executions_meeting_audit_id ON public.executions(meeting_audit_id);
+CREATE INDEX IF NOT EXISTS idx_executions_meeting_audit_id ON public.executions(meeting_audit_id);
 
 ALTER TABLE public.executions ENABLE ROW LEVEL SECURITY;
 
--- For executions, we need to join through meeting_audits to check ownership
+DROP POLICY IF EXISTS "executions_select_own" ON public.executions;
+DROP POLICY IF EXISTS "executions_insert_own" ON public.executions;
+DROP POLICY IF EXISTS "executions_update_own" ON public.executions;
+
 CREATE POLICY "executions_select_own" ON public.executions 
   FOR SELECT USING (
     EXISTS (
@@ -229,9 +279,6 @@ CREATE POLICY "executions_update_own" ON public.executions
 -- ==========================================
 -- APPROVAL REQUESTS TABLE
 -- ==========================================
-CREATE TYPE delivery_channel AS ENUM ('web', 'whatsapp');
-CREATE TYPE delivery_status AS ENUM ('pending', 'sent', 'delivered', 'failed', 'responded');
-
 CREATE TABLE IF NOT EXISTS public.approval_requests (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -244,10 +291,15 @@ CREATE TABLE IF NOT EXISTS public.approval_requests (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_approval_requests_user_id ON public.approval_requests(user_id);
-CREATE INDEX idx_approval_requests_meeting_audit_id ON public.approval_requests(meeting_audit_id);
+CREATE INDEX IF NOT EXISTS idx_approval_requests_user_id ON public.approval_requests(user_id);
+CREATE INDEX IF NOT EXISTS idx_approval_requests_meeting_audit_id ON public.approval_requests(meeting_audit_id);
 
 ALTER TABLE public.approval_requests ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "approval_requests_select_own" ON public.approval_requests;
+DROP POLICY IF EXISTS "approval_requests_insert_own" ON public.approval_requests;
+DROP POLICY IF EXISTS "approval_requests_update_own" ON public.approval_requests;
+DROP POLICY IF EXISTS "approval_requests_delete_own" ON public.approval_requests;
 
 CREATE POLICY "approval_requests_select_own" ON public.approval_requests FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "approval_requests_insert_own" ON public.approval_requests FOR INSERT WITH CHECK (auth.uid() = user_id);
@@ -300,6 +352,15 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Apply updated_at triggers to all tables
+DROP TRIGGER IF EXISTS update_profiles_updated_at ON public.profiles;
+DROP TRIGGER IF EXISTS update_user_preferences_updated_at ON public.user_preferences;
+DROP TRIGGER IF EXISTS update_connected_accounts_updated_at ON public.connected_accounts;
+DROP TRIGGER IF EXISTS update_calendar_events_updated_at ON public.calendar_events;
+DROP TRIGGER IF EXISTS update_meeting_contexts_updated_at ON public.meeting_contexts;
+DROP TRIGGER IF EXISTS update_meeting_audits_updated_at ON public.meeting_audits;
+DROP TRIGGER IF EXISTS update_executions_updated_at ON public.executions;
+DROP TRIGGER IF EXISTS update_approval_requests_updated_at ON public.approval_requests;
+
 CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 CREATE TRIGGER update_user_preferences_updated_at BEFORE UPDATE ON public.user_preferences FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 CREATE TRIGGER update_connected_accounts_updated_at BEFORE UPDATE ON public.connected_accounts FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
