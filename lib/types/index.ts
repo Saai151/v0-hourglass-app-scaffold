@@ -25,6 +25,12 @@ export type DeliveryChannel = 'web' | 'whatsapp'
 
 export type DeliveryStatus = 'pending' | 'sent' | 'delivered' | 'failed' | 'responded'
 
+export type MeetingDocumentType = 'transcript' | 'notes'
+
+export type MeetingChatRole = 'system' | 'user' | 'assistant'
+
+export type MeetingChatScope = 'single_meeting' | 'cross_meeting'
+
 // ==========================================
 // DATABASE MODELS
 // ==========================================
@@ -106,6 +112,78 @@ export interface MeetingContext {
   updated_at: string
 }
 
+export interface MeetingDocument {
+  id: string
+  user_id: string
+  calendar_event_id: string
+  title: string
+  document_type: MeetingDocumentType
+  content: string
+  source_metadata: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+
+export interface MeetingChunk {
+  id: string
+  user_id: string
+  calendar_event_id: string
+  meeting_document_id: string
+  chunk_index: number
+  content: string
+  search_text: string
+  source_label: string | null
+  metadata: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+
+export interface MeetingSummary {
+  id: string
+  user_id: string
+  calendar_event_id: string
+  summary: string
+  decisions: string[]
+  action_items: string[]
+  open_questions: string[]
+  participants: string[]
+  source_document_ids: string[]
+  search_text: string
+  created_at: string
+  updated_at: string
+}
+
+export interface MeetingChatThread {
+  id: string
+  user_id: string
+  title: string
+  scope: MeetingChatScope
+  calendar_event_id: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface MeetingChatMessage {
+  id: string
+  thread_id: string
+  user_id: string
+  role: MeetingChatRole
+  content: string
+  citations: MeetingCitation[]
+  retrieval_context: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+
+export interface MeetingCitation {
+  type: 'summary' | 'chunk'
+  meeting_id: string
+  meeting_title: string
+  document_id?: string
+  document_title?: string
+  excerpt: string
+}
+
 export interface ProposedAction {
   type: 'shorten' | 'cancel' | 'delegate' | 'convert_async' | 'send_email' | 'send_slack' | 'create_focus_block'
   description: string
@@ -170,6 +248,23 @@ export interface CalendarEventWithAudit extends CalendarEvent {
   meeting_context?: MeetingContext
 }
 
+export interface MeetingDocumentWithEvent extends MeetingDocument {
+  calendar_event: CalendarEvent
+}
+
+export interface MeetingSummaryWithEvent extends MeetingSummary {
+  calendar_event: CalendarEvent
+}
+
+export interface MeetingChatMessageWithThread extends MeetingChatMessage {
+  thread: MeetingChatThread
+}
+
+export interface MeetingChatThreadWithMessages extends MeetingChatThread {
+  calendar_event?: CalendarEvent | null
+  messages: MeetingChatMessage[]
+}
+
 // ==========================================
 // API REQUEST/RESPONSE TYPES
 // ==========================================
@@ -209,6 +304,30 @@ export interface AuditRunRequest {
 export interface AuditRunResponse {
   audits_created: number
   audits: MeetingAudit[]
+}
+
+export interface MeetingDocumentUpsertRequest {
+  title: string
+  document_type: MeetingDocumentType
+  content: string
+  source_metadata?: Record<string, unknown>
+}
+
+export interface MeetingDocumentUpsertResponse {
+  document: MeetingDocument
+  summary: MeetingSummary
+  chunk_count: number
+}
+
+export interface MeetingChatRequest {
+  message: string
+  thread_id?: string
+  meeting_id?: string
+}
+
+export interface MeetingChatResponse {
+  thread: MeetingChatThread
+  message: MeetingChatMessage
 }
 
 export interface ApprovalResponse {

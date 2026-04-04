@@ -7,6 +7,7 @@ import { HourglassIcon } from '@/components/icons'
 import {
   Inbox,
   Calendar,
+  MessageSquare,
   Link2,
   Settings,
   LogOut,
@@ -29,6 +30,12 @@ const navItems = [
     href: '/dashboard/meetings',
     icon: Calendar,
     description: 'Your calendar events',
+  },
+  {
+    label: 'Chat',
+    href: '/dashboard/chat',
+    icon: MessageSquare,
+    description: 'Ask across meeting notes',
   },
   {
     label: 'Integrations',
