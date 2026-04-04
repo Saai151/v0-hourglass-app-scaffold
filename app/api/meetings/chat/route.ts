@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import {
+  isMissingMeetingChatSchemaError,
+  missingMeetingChatSchemaResponse,
+} from '@/lib/meetings/errors'
 import { answerMeetingQuestion, retrieveMeetingContext } from '@/lib/meetings/service'
 import type { MeetingChatRequest } from '@/lib/types'
 
@@ -65,6 +69,9 @@ export async function POST(request: Request) {
       .single()
 
     if (error || !existingThread) {
+      if (isMissingMeetingChatSchemaError(error)) {
+        return missingMeetingChatSchemaResponse()
+      }
       return NextResponse.json({ error: 'Chat thread not found' }, { status: 404 })
     }
 
@@ -82,6 +89,9 @@ export async function POST(request: Request) {
       .single()
 
     if (error || !createdThread) {
+      if (isMissingMeetingChatSchemaError(error)) {
+        return missingMeetingChatSchemaResponse()
+      }
       return NextResponse.json({ error: error?.message ?? 'Failed to create chat thread' }, { status: 500 })
     }
 
@@ -112,6 +122,9 @@ export async function POST(request: Request) {
     })
 
   if (userMessageError) {
+    if (isMissingMeetingChatSchemaError(userMessageError)) {
+      return missingMeetingChatSchemaResponse()
+    }
     return NextResponse.json({ error: userMessageError.message }, { status: 500 })
   }
 
@@ -143,6 +156,9 @@ export async function POST(request: Request) {
     .single()
 
   if (assistantError || !assistantMessage) {
+    if (isMissingMeetingChatSchemaError(assistantError)) {
+      return missingMeetingChatSchemaResponse()
+    }
     return NextResponse.json(
       { error: assistantError?.message ?? 'Failed to save assistant response' },
       { status: 500 }

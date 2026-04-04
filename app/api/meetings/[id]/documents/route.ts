@@ -1,4 +1,8 @@
 import { NextResponse } from 'next/server'
+import {
+  isMissingMeetingChatSchemaError,
+  missingMeetingChatSchemaResponse,
+} from '@/lib/meetings/errors'
 import { createClient } from '@/lib/supabase/server'
 import { buildDocumentChunks, summarizeMeeting } from '@/lib/meetings/service'
 import type { CalendarEvent, MeetingDocumentUpsertRequest } from '@/lib/types'
@@ -55,7 +59,7 @@ export async function GET(_: Request, { params }: RouteParams) {
     return response!
   }
 
-  const [{ data: documents }, { data: summary }] = await Promise.all([
+  const [{ data: documents, error: documentsError }, { data: summary, error: summaryError }] = await Promise.all([
     supabase
       .from('meeting_documents')
       .select('*')
@@ -67,6 +71,10 @@ export async function GET(_: Request, { params }: RouteParams) {
       .eq('calendar_event_id', id)
       .maybeSingle(),
   ])
+
+  if (isMissingMeetingChatSchemaError(documentsError) || isMissingMeetingChatSchemaError(summaryError)) {
+    return missingMeetingChatSchemaResponse()
+  }
 
   return NextResponse.json({
     event,
@@ -109,6 +117,9 @@ export async function POST(request: Request, { params }: RouteParams) {
     .single()
 
   if (insertError || !document) {
+    if (isMissingMeetingChatSchemaError(insertError)) {
+      return missingMeetingChatSchemaResponse()
+    }
     return NextResponse.json({ error: insertError?.message ?? 'Failed to save document' }, { status: 500 })
   }
 
@@ -122,6 +133,9 @@ export async function POST(request: Request, { params }: RouteParams) {
   if (chunks.length > 0) {
     const { error: chunkError } = await supabase.from('meeting_chunks').insert(chunks)
     if (chunkError) {
+      if (isMissingMeetingChatSchemaError(chunkError)) {
+        return missingMeetingChatSchemaResponse()
+      }
       return NextResponse.json({ error: chunkError.message }, { status: 500 })
     }
   }
@@ -134,6 +148,9 @@ export async function POST(request: Request, { params }: RouteParams) {
     .order('created_at', { ascending: true })
 
   if (documentsError || !documents) {
+    if (isMissingMeetingChatSchemaError(documentsError)) {
+      return missingMeetingChatSchemaResponse()
+    }
     return NextResponse.json(
       { error: documentsError?.message ?? 'Failed to reload meeting documents' },
       { status: 500 }
@@ -154,6 +171,9 @@ export async function POST(request: Request, { params }: RouteParams) {
     .single()
 
   if (summaryError || !upsertedSummary) {
+    if (isMissingMeetingChatSchemaError(summaryError)) {
+      return missingMeetingChatSchemaResponse()
+    }
     return NextResponse.json(
       { error: summaryError?.message ?? 'Failed to save meeting summary' },
       { status: 500 }
