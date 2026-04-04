@@ -1,9 +1,29 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
-import { Inbox, Calendar, Link2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Inbox, Calendar, Link2, Database, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { GenerateAuditButton } from '@/components/audit/generate-audit-button'
 
 export function InboxEmptyState() {
+  const router = useRouter()
+  const [isSeeding, setIsSeeding] = useState(false)
+
+  async function handleSeedDemo() {
+    setIsSeeding(true)
+    try {
+      const res = await fetch('/api/events/seed', { method: 'POST' })
+      if (res.ok) {
+        router.refresh()
+      }
+    } finally {
+      setIsSeeding(false)
+    }
+  }
+
   return (
     <div className="flex items-center justify-center h-full">
       <Card className="max-w-md text-center">
@@ -33,6 +53,29 @@ export function InboxEmptyState() {
           <Button asChild>
             <Link href="/dashboard/integrations">Set up integrations</Link>
           </Button>
+          <div className="relative my-2">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">or try a demo</span>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Button
+              variant="outline"
+              onClick={handleSeedDemo}
+              disabled={isSeeding}
+            >
+              {isSeeding ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Database className="h-4 w-4 mr-2" />
+              )}
+              {isSeeding ? 'Loading demo meetings...' : 'Load demo meetings'}
+            </Button>
+            <GenerateAuditButton variant="secondary" size="default" />
+          </div>
         </CardContent>
       </Card>
     </div>
