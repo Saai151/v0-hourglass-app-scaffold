@@ -103,7 +103,7 @@ importers:
         version: 2.101.1
       '@vercel/analytics':
         specifier: 1.6.1
-        version: 1.6.1(next@16.2.0(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
+        version: 1.6.1(next@16.2.0(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
       ai:
         specifier: ^4.3.0
         version: 4.3.19(react@19.2.4)(zod@3.25.76)
@@ -133,7 +133,7 @@ importers:
         version: 0.564.0(react@19.2.4)
       next:
         specifier: 16.2.0
-        version: 16.2.0(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: 16.2.0(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -183,6 +183,9 @@ importers:
       '@types/react-dom':
         specifier: 19.2.3
         version: 19.2.3(@types/react@19.2.14)
+      babel-plugin-react-compiler:
+        specifier: ^1.0.0
+        version: 1.0.0
       postcss:
         specifier: ^8.5
         version: 8.5.8
@@ -234,8 +237,20 @@ packages:
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
 
+  '@babel/helper-string-parser@7.27.1':
+    resolution: {integrity: sha512-qMlSxKbpRlAridDExk92nSobyDdpPijUq2DW6oDnUqd0iOGxmQjyqhMIihI9+zv4LPyZdRje2cavWPbCbWm3eA==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/helper-validator-identifier@7.28.5':
+    resolution: {integrity: sha512-qSs4ifwzKJSV39ucNjsvc6WVHs6b7S03sOh2OcHF9UHfVPqWWALUsNUVzhSBiItjRZoLHx7nIarVjqKVusUZ1Q==}
+    engines: {node: '>=6.9.0'}
+
   '@babel/runtime@7.29.2':
     resolution: {integrity: sha512-JiDShH45zKHWyGe4ZNVRrCjBz8Nh9TMmZG1kh4QTK8hCBTWBi8Da+i7s1fJw7/lYpM4ccepSNfqzZ/QvABBi5g==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/types@7.29.0':
+    resolution: {integrity: sha512-LwdZHpScM4Qz8Xw2iKSzS+cfglZzJGvofQICy7W7v4caru4EaAmyUuO6BGrbyQ2mYV11W0U8j5mBhd14dd3B0A==}
     engines: {node: '>=6.9.0'}
 
   '@date-fns/tz@1.4.1':
@@ -1345,6 +1360,9 @@ packages:
     peerDependencies:
       postcss: ^8.1.0
 
+  babel-plugin-react-compiler@1.0.0:
+    resolution: {integrity: sha512-Ixm8tFfoKKIPYdCCKYTsqv+Fd4IJ0DQqMyEimo+pxUOMUR9cVPlwTrFt9Avu+3cb6Zp3mAzl+t1MrG2fxxKsxw==}
+
   baseline-browser-mapping@2.10.14:
     resolution: {integrity: sha512-fOVLPAsFTsQfuCkvahZkzq6nf8KvGWanlYoTh0SVA0A/PIUxQGU2AOZAoD95n2gFLVDW/jP6sbGLny95nmEuHA==}
     engines: {node: '>=6.0.0'}
@@ -1923,7 +1941,16 @@ snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
 
+  '@babel/helper-string-parser@7.27.1': {}
+
+  '@babel/helper-validator-identifier@7.28.5': {}
+
   '@babel/runtime@7.29.2': {}
+
+  '@babel/types@7.29.0':
+    dependencies:
+      '@babel/helper-string-parser': 7.27.1
+      '@babel/helper-validator-identifier': 7.28.5
 
   '@date-fns/tz@1.4.1': {}
 
@@ -2955,9 +2982,9 @@ snapshots:
     dependencies:
       '@types/node': 22.19.17
 
-  '@vercel/analytics@1.6.1(next@16.2.0(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)':
+  '@vercel/analytics@1.6.1(next@16.2.0(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)':
     optionalDependencies:
-      next: 16.2.0(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      next: 16.2.0(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react: 19.2.4
 
   ai@4.3.19(react@19.2.4)(zod@3.25.76):
@@ -2984,6 +3011,10 @@ snapshots:
       picocolors: 1.1.1
       postcss: 8.5.8
       postcss-value-parser: 4.2.0
+
+  babel-plugin-react-compiler@1.0.0:
+    dependencies:
+      '@babel/types': 7.29.0
 
   baseline-browser-mapping@2.10.14: {}
 
@@ -3202,7 +3233,7 @@ snapshots:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
 
-  next@16.2.0(@opentelemetry/api@1.9.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  next@16.2.0(@opentelemetry/api@1.9.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
       '@next/env': 16.2.0
       '@swc/helpers': 0.5.15
@@ -3222,6 +3253,7 @@ snapshots:
       '@next/swc-win32-arm64-msvc': 16.2.0
       '@next/swc-win32-x64-msvc': 16.2.0
       '@opentelemetry/api': 1.9.0
+      babel-plugin-react-compiler: 1.0.0
       sharp: 0.34.5
     transitivePeerDependencies:
       - '@babel/core'
