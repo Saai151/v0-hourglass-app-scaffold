@@ -9,7 +9,7 @@ import {
 import { meetingAuditResultSchema, type MeetingAuditResult } from './schemas'
 
 /**
- * Audits a single calendar event using Claude.
+ * Audits a single calendar event using the configured AI model.
  *
  * Uses the Vercel AI SDK's generateObject() which handles structured
  * output and Zod validation in a single call — the schema is the

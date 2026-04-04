@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 /**
- * Validates the structured output returned by Claude via tool_use.
+ * Validates the structured output returned by the AI model.
  * If the AI returns unexpected values (e.g., a verdict typo or
  * confidence > 1), this catches it before it reaches the database.
  */
