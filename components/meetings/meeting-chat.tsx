@@ -27,6 +27,22 @@ interface MeetingChatProps {
   } | null
 }
 
+async function readResponsePayload(response: Response) {
+  const text = await response.text()
+
+  if (!text) {
+    return null
+  }
+
+  try {
+    return JSON.parse(text) as Record<string, unknown>
+  } catch {
+    return {
+      error: text,
+    }
+  }
+}
+
 function CitationList({ citations }: { citations: MeetingCitation[] }) {
   if (!citations.length) return null
 
@@ -100,9 +116,17 @@ export function MeetingChat({
         }),
       })
 
-      const payload = await response.json()
+      const payload = await readResponsePayload(response)
       if (!response.ok) {
-        throw new Error(payload.error || 'Failed to send message')
+        throw new Error(
+          typeof payload?.error === 'string'
+            ? payload.error
+            : 'Failed to send message'
+        )
+      }
+
+      if (!payload?.thread || !payload.message) {
+        throw new Error('The server returned an unexpected response.')
       }
 
       const nextThread = payload.thread as MeetingChatThread
