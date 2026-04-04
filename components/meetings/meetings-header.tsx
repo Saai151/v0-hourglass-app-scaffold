@@ -1,10 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { RefreshCw, Loader2 } from 'lucide-react'
+import { RefreshCw, Loader2, MessageSquare } from 'lucide-react'
 import { GenerateAuditButton } from '@/components/audit/generate-audit-button'
 
 interface MeetingsHeaderProps {
@@ -39,6 +40,12 @@ export function MeetingsHeader({ eventCount }: MeetingsHeaderProps) {
           )}
         </div>
         <div className="flex items-center gap-2">
+          <Button asChild variant="outline" size="sm" className="gap-2">
+            <Link href="/dashboard/chat">
+              <MessageSquare className="h-4 w-4" />
+              Meeting chat
+            </Link>
+          </Button>
           <Button
             variant="outline"
             size="sm"

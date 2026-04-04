@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { format, isToday, isTomorrow, startOfDay } from 'date-fns'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -9,6 +10,7 @@ import {
   Clock, 
   Users, 
   ExternalLink,
+  ArrowRight,
   CheckCircle,
   Clock4,
   Sparkles
@@ -147,6 +149,12 @@ export function MeetingsList({ events }: MeetingsListProps) {
                             </a>
                           </Button>
                         )}
+                        <Button asChild variant="outline" size="sm">
+                          <Link href={`/dashboard/meetings/${event.id}`}>
+                            Workspace
+                            <ArrowRight className="h-4 w-4 ml-2" />
+                          </Link>
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
