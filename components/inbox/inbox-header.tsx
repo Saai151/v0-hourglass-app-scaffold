@@ -1,4 +1,7 @@
+'use client'
+
 import { Badge } from '@/components/ui/badge'
+import { GenerateAuditButton } from '@/components/audit/generate-audit-button'
 
 interface InboxHeaderProps {
   pendingCount: number
@@ -16,9 +19,12 @@ export function InboxHeader({ pendingCount }: InboxHeaderProps) {
             </Badge>
           )}
         </div>
-        <p className="text-sm text-muted-foreground">
-          Review AI recommendations for your meetings
-        </p>
+        <div className="flex items-center gap-3">
+          <p className="text-sm text-muted-foreground hidden sm:block">
+            Review AI recommendations for your meetings
+          </p>
+          <GenerateAuditButton variant="outline" />
+        </div>
       </div>
     </header>
   )

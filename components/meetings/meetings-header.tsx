@@ -1,12 +1,32 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { RefreshCw } from 'lucide-react'
+import { RefreshCw, Loader2 } from 'lucide-react'
+import { GenerateAuditButton } from '@/components/audit/generate-audit-button'
 
 interface MeetingsHeaderProps {
   eventCount: number
 }
 
 export function MeetingsHeader({ eventCount }: MeetingsHeaderProps) {
+  const router = useRouter()
+  const [isSyncing, setIsSyncing] = useState(false)
+
+  async function handleSync() {
+    setIsSyncing(true)
+    try {
+      const res = await fetch('/api/events/seed', { method: 'POST' })
+      if (res.ok) {
+        router.refresh()
+      }
+    } finally {
+      setIsSyncing(false)
+    }
+  }
+
   return (
     <header className="border-b bg-card px-6 py-4">
       <div className="flex items-center justify-between">
@@ -18,10 +38,23 @@ export function MeetingsHeader({ eventCount }: MeetingsHeaderProps) {
             </Badge>
           )}
         </div>
-        <Button variant="outline" size="sm" className="gap-2">
-          <RefreshCw className="h-4 w-4" />
-          Sync calendar
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={handleSync}
+            disabled={isSyncing}
+          >
+            {isSyncing ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4" />
+            )}
+            {isSyncing ? 'Syncing...' : 'Sync calendar'}
+          </Button>
+          {eventCount > 0 && <GenerateAuditButton variant="outline" />}
+        </div>
       </div>
     </header>
   )

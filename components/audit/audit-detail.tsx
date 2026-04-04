@@ -58,7 +58,7 @@ interface MeetingAudit {
   approval_message: string
   draft_email?: string
   draft_slack_message?: string
-  proposed_actions: { action: string; description: string }[]
+  proposed_actions: { type: string; description: string }[]
   status: AuditStatus
   calendar_event: CalendarEvent
   meeting_context?: MeetingContext[]
@@ -263,7 +263,7 @@ export function AuditDetail({ audit }: AuditDetailProps) {
                   <ul className="space-y-2">
                     {audit.proposed_actions.map((action, i) => (
                       <li key={i} className="text-sm bg-muted/50 rounded-lg p-3">
-                        <p className="font-medium">{action.action}</p>
+                        <p className="font-medium">{action.type}</p>
                         <p className="text-muted-foreground">{action.description}</p>
                       </li>
                     ))}
