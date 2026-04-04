@@ -6,3 +6,6 @@ import { groq } from '@ai-sdk/groq'
  * Reads GROQ_API_KEY from the environment automatically.
  */
 export const auditModel = groq('llama-3.3-70b-versatile')
+
+/** Model used by the meeting chat assistant. */
+export const chatModel = groq('llama-3.3-70b-versatile')
