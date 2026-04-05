@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { formatDistanceToNow, format } from 'date-fns'
@@ -112,9 +112,6 @@ export function InboxList({ audits }: InboxListProps) {
 
   const allSelected = selected.size === audits.length && audits.length > 0
   const someSelected = selected.size > 0
-  const lastCountRef = useRef(selected.size)
-  if (selected.size > 0) lastCountRef.current = selected.size
-  const displayCount = someSelected ? selected.size : lastCountRef.current
 
   function toggleSelect(id: string) {
     setSelected((prev) => {
@@ -197,41 +194,40 @@ export function InboxList({ audits }: InboxListProps) {
             {allSelected ? 'Deselect all' : 'Select all'}
           </span>
         </label>
-        <div className={cn(
-          'flex items-center gap-3',
-          someSelected ? 'visible' : 'invisible',
-        )}>
-          <span className="text-sm text-muted-foreground">
-            {displayCount} selected
-          </span>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleBulkReject}
-            disabled={isBulkActioning}
-            className="gap-2"
-          >
-            {isBulkRejecting ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <XCircle className="h-4 w-4" />
-            )}
-            {isBulkRejecting ? 'Rejecting...' : `Reject ${displayCount}`}
-          </Button>
-          <Button
-            size="sm"
-            onClick={handleBulkApprove}
-            disabled={isBulkActioning}
-            className="gap-2"
-          >
-            {isBulkApproving ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <CheckCircle className="h-4 w-4" />
-            )}
-            {isBulkApproving ? 'Approving...' : `Approve ${displayCount}`}
-          </Button>
-        </div>
+        {someSelected && (
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted-foreground">
+              {selected.size} selected
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleBulkReject}
+              disabled={isBulkActioning}
+              className="gap-2"
+            >
+              {isBulkRejecting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <XCircle className="h-4 w-4" />
+              )}
+              {isBulkRejecting ? 'Rejecting...' : `Reject ${selected.size}`}
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleBulkApprove}
+              disabled={isBulkActioning}
+              className="gap-2"
+            >
+              {isBulkApproving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <CheckCircle className="h-4 w-4" />
+              )}
+              {isBulkApproving ? 'Approving...' : `Approve ${selected.size}`}
+            </Button>
+          </div>
+        )}
       </div>
 
       {audits.map((audit) => {
