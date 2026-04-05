@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { formatDistanceToNow, format } from 'date-fns'
@@ -112,6 +112,9 @@ export function InboxList({ audits }: InboxListProps) {
 
   const allSelected = selected.size === audits.length && audits.length > 0
   const someSelected = selected.size > 0
+  const lastCountRef = useRef(selected.size)
+  if (selected.size > 0) lastCountRef.current = selected.size
+  const displayCount = someSelected ? selected.size : lastCountRef.current
 
   function toggleSelect(id: string) {
     setSelected((prev) => {
@@ -199,7 +202,7 @@ export function InboxList({ audits }: InboxListProps) {
           someSelected ? 'visible' : 'invisible',
         )}>
           <span className="text-sm text-muted-foreground">
-            {selected.size || 1} selected
+            {displayCount} selected
           </span>
           <Button
             size="sm"
@@ -213,7 +216,7 @@ export function InboxList({ audits }: InboxListProps) {
             ) : (
               <XCircle className="h-4 w-4" />
             )}
-            {isBulkRejecting ? 'Rejecting...' : `Reject ${selected.size}`}
+            {isBulkRejecting ? 'Rejecting...' : `Reject ${displayCount}`}
           </Button>
           <Button
             size="sm"
@@ -226,7 +229,7 @@ export function InboxList({ audits }: InboxListProps) {
             ) : (
               <CheckCircle className="h-4 w-4" />
             )}
-            {isBulkApproving ? 'Approving...' : `Approve ${selected.size}`}
+            {isBulkApproving ? 'Approving...' : `Approve ${displayCount}`}
           </Button>
         </div>
       </div>
