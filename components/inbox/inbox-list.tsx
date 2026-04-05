@@ -108,6 +108,7 @@ export function InboxList({ audits }: InboxListProps) {
   const router = useRouter()
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [isBulkApproving, setIsBulkApproving] = useState(false)
+  const [isBulkRejecting, setIsBulkRejecting] = useState(false)
 
   const allSelected = selected.size === audits.length && audits.length > 0
   const someSelected = selected.size > 0
@@ -157,6 +158,29 @@ export function InboxList({ audits }: InboxListProps) {
     setIsBulkApproving(false)
   }
 
+  async function handleBulkReject() {
+    if (selected.size === 0) return
+    setIsBulkRejecting(true)
+    const supabase = createClient()
+
+    const ids = Array.from(selected)
+    const { error } = await supabase
+      .from('meeting_audits')
+      .update({ status: 'rejected' })
+      .in('id', ids)
+
+    if (error) {
+      toast.error('Failed to reject audits.')
+    } else {
+      toast.success(`${ids.length} audit${ids.length > 1 ? 's' : ''} rejected.`)
+      setSelected(new Set())
+      router.refresh()
+    }
+    setIsBulkRejecting(false)
+  }
+
+  const isBulkActioning = isBulkApproving || isBulkRejecting
+
   return (
     <div className="flex flex-col gap-4">
       {/* Bulk actions bar */}
@@ -177,8 +201,22 @@ export function InboxList({ audits }: InboxListProps) {
             </span>
             <Button
               size="sm"
+              variant="outline"
+              onClick={handleBulkReject}
+              disabled={isBulkActioning}
+              className="gap-2"
+            >
+              {isBulkRejecting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <XCircle className="h-4 w-4" />
+              )}
+              {isBulkRejecting ? 'Rejecting...' : `Reject ${selected.size}`}
+            </Button>
+            <Button
+              size="sm"
               onClick={handleBulkApprove}
-              disabled={isBulkApproving}
+              disabled={isBulkActioning}
               className="gap-2"
             >
               {isBulkApproving ? (
