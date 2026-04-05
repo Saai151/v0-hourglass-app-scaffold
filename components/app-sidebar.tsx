@@ -56,9 +56,10 @@ interface AppSidebarProps {
     email?: string
     full_name?: string
   }
+  pendingAuditCount?: number
 }
 
-export function AppSidebar({ user }: AppSidebarProps) {
+export function AppSidebar({ user, pendingAuditCount = 0 }: AppSidebarProps) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
 
@@ -98,9 +99,21 @@ export function AppSidebar({ user }: AppSidebarProps) {
                   )}
                   title={collapsed ? item.label : undefined}
                 >
-                  <item.icon className="h-5 w-5 flex-shrink-0" />
+                  <div className="relative flex-shrink-0">
+                    <item.icon className="h-5 w-5" />
+                    {item.label === 'Inbox' && pendingAuditCount > 0 && collapsed && (
+                      <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+                        {pendingAuditCount > 9 ? '9+' : pendingAuditCount}
+                      </span>
+                    )}
+                  </div>
                   {!collapsed && (
-                    <span className="text-sm font-medium">{item.label}</span>
+                    <span className="flex-1 text-sm font-medium">{item.label}</span>
+                  )}
+                  {!collapsed && item.label === 'Inbox' && pendingAuditCount > 0 && (
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[11px] font-bold text-destructive-foreground">
+                      {pendingAuditCount > 99 ? '99+' : pendingAuditCount}
+                    </span>
                   )}
                 </Link>
               </li>
