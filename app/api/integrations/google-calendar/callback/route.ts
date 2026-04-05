@@ -10,11 +10,19 @@ export async function GET(request: Request) {
   const code = searchParams.get('code')
   const stateParam = searchParams.get('state')
   const errorParam = searchParams.get('error')
+  const grantedScope = searchParams.get('scope') || ''
 
   // User denied consent or Google returned an error
   if (errorParam || !code || !stateParam) {
     return NextResponse.redirect(
       `${BASE_URL}/dashboard/integrations?error=${errorParam || 'missing_params'}`,
+    )
+  }
+
+  // Check if user granted the calendar scope
+  if (!grantedScope.includes('calendar.readonly')) {
+    return NextResponse.redirect(
+      `${BASE_URL}/dashboard/integrations?error=missing_calendar_scope`,
     )
   }
 

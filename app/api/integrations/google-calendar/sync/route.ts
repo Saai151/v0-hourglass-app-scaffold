@@ -61,8 +61,20 @@ export async function POST() {
     })
   } catch (err) {
     console.error('Google Calendar sync error:', err)
+
+    const message = err instanceof Error ? err.message : ''
+    if (message.includes('insufficient authentication scopes')) {
+      return NextResponse.json(
+        {
+          error: 'Calendar permission not granted. Please disconnect and reconnect, making sure to check the Google Calendar checkbox on the consent screen.',
+          code: 'missing_scope',
+        },
+        { status: 403 },
+      )
+    }
+
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Sync failed' },
+      { error: message || 'Sync failed' },
       { status: 500 },
     )
   }

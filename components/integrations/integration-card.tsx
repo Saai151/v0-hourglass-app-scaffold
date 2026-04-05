@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -15,6 +15,7 @@ import {
   ExternalLink,
   RefreshCw,
 } from 'lucide-react'
+import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
@@ -55,22 +56,30 @@ export function IntegrationCard({ integration }: IntegrationCardProps) {
   const hasError = status === 'error'
 
   // Show toast for successful connection (from OAuth callback redirect)
-  const justConnected = searchParams.get('connected') === integration.id
-  if (justConnected) {
-    // Clear the param after showing
-    toast.success(`${integration.name} connected successfully!`)
-    const url = new URL(window.location.href)
-    url.searchParams.delete('connected')
-    window.history.replaceState({}, '', url.toString())
-  }
+  useEffect(() => {
+    const justConnected = searchParams.get('connected') === integration.id
+    if (justConnected) {
+      toast.success(`${integration.name} connected successfully!`)
+      const url = new URL(window.location.href)
+      url.searchParams.delete('connected')
+      window.history.replaceState({}, '', url.toString())
+    }
 
-  const errorParam = searchParams.get('error')
-  if (errorParam && !isConnected) {
-    toast.error(`Connection failed: ${errorParam}`)
-    const url = new URL(window.location.href)
-    url.searchParams.delete('error')
-    window.history.replaceState({}, '', url.toString())
-  }
+    const errorParam = searchParams.get('error')
+    if (errorParam) {
+      const errorMessages: Record<string, string> = {
+        missing_calendar_scope: 'Calendar permission was not granted. Please connect again and make sure to check the "Google Calendar" checkbox on the consent screen.',
+        access_denied: 'Access was denied. Please try connecting again.',
+        invalid_state: 'Session expired. Please try connecting again.',
+        auth_mismatch: 'Authentication mismatch. Please log in and try again.',
+        token_exchange_failed: 'Failed to complete connection. Please try again.',
+      }
+      toast.error(errorMessages[errorParam] || `Connection failed: ${errorParam}`, { duration: 10000 })
+      const url = new URL(window.location.href)
+      url.searchParams.delete('error')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, [searchParams, integration.id, integration.name, isConnected])
 
   async function handleConnect() {
     if (integration.id === 'google_calendar') {
@@ -110,13 +119,24 @@ export function IntegrationCard({ integration }: IntegrationCardProps) {
       const res = await fetch('/api/integrations/google-calendar/sync', { method: 'POST' })
       const data = await res.json()
       if (res.ok) {
-        toast.success(`Synced ${data.synced} events from Google Calendar.`)
+        toast.success(`Synced ${data.synced} events from Google Calendar.`, {
+          action: {
+            label: 'View Meetings',
+            onClick: () => router.push('/dashboard/meetings'),
+          },
+          duration: 8000,
+        })
         router.refresh()
+      } else if (data.code === 'missing_scope') {
+        toast.error(
+          'Calendar permission not granted. Please disconnect and reconnect, making sure to check the "Google Calendar" checkbox on the consent screen.',
+          { duration: 12000 },
+        )
       } else {
-        toast.error(data.error || 'Sync failed.')
+        toast.error(data.error || 'Sync failed.', { duration: 8000 })
       }
     } catch {
-      toast.error('Sync failed.')
+      toast.error('Sync failed.', { duration: 8000 })
     } finally {
       setIsSyncing(false)
     }
