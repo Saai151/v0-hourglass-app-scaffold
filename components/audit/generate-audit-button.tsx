@@ -35,13 +35,10 @@ export function GenerateAuditButton({
       if (data.audits_created === 0) {
         toast.info(data.message || 'All meetings already have audits.', { duration: 6000 })
       } else {
-        toast.success(`${data.audits_created} meeting${data.audits_created > 1 ? 's' : ''} audited!`, {
-          action: {
-            label: 'Review in Inbox',
-            onClick: () => router.push('/dashboard'),
-          },
-          duration: 10000,
-        })
+        toast.success(`${data.audits_created} meeting${data.audits_created > 1 ? 's' : ''} audited! Redirecting to inbox...`, { duration: 3000 })
+        router.push('/dashboard')
+        router.refresh()
+        return
       }
 
       router.refresh()

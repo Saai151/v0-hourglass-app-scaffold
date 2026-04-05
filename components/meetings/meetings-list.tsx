@@ -1,21 +1,26 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { format, isToday, isTomorrow, startOfDay } from 'date-fns'
+import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { 
-  Calendar, 
-  Clock, 
-  Users, 
+import {
+  Calendar,
+  Clock,
+  Users,
   ExternalLink,
   ArrowRight,
   CheckCircle,
   Clock4,
-  Sparkles
+  Sparkles,
+  Trash2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 
 type Verdict = 'keep' | 'shorten' | 'asyncify' | 'delegate' | 'cancel' | 'needs_context'
 type AuditStatus = 'pending' | 'approved' | 'rejected' | 'executed' | 'expired'
@@ -43,7 +48,7 @@ interface MeetingsListProps {
 
 function groupEventsByDay(events: CalendarEvent[]) {
   const groups: Record<string, CalendarEvent[]> = {}
-  
+
   events.forEach(event => {
     const day = startOfDay(new Date(event.start_time)).toISOString()
     if (!groups[day]) {
@@ -51,7 +56,7 @@ function groupEventsByDay(events: CalendarEvent[]) {
     }
     groups[day].push(event)
   })
-  
+
   return groups
 }
 
@@ -63,8 +68,34 @@ function getDayLabel(dateStr: string): string {
 }
 
 export function MeetingsList({ events }: MeetingsListProps) {
+  const router = useRouter()
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const groupedEvents = groupEventsByDay(events)
   const sortedDays = Object.keys(groupedEvents).sort()
+
+  async function handleDelete(eventId: string, title: string) {
+    setDeletingId(eventId)
+    const supabase = createClient()
+
+    // Delete associated audits first, then the event
+    await supabase
+      .from('meeting_audits')
+      .delete()
+      .eq('calendar_event_id', eventId)
+
+    const { error } = await supabase
+      .from('calendar_events')
+      .delete()
+      .eq('id', eventId)
+
+    if (error) {
+      toast.error(`Failed to delete "${title}".`)
+    } else {
+      toast.success(`"${title}" removed.`)
+      router.refresh()
+    }
+    setDeletingId(null)
+  }
 
   return (
     <div className="space-y-8">
@@ -80,9 +111,13 @@ export function MeetingsList({ events }: MeetingsListProps) {
               const duration = Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60))
               const attendeeCount = event.attendees?.length || 0
               const audit = event.meeting_audit?.[0]
+              const isDeleting = deletingId === event.id
 
               return (
-                <Card key={event.id} className="hover:border-primary/30 transition-colors">
+                <Card key={event.id} className={cn(
+                  'hover:border-primary/30 transition-colors',
+                  isDeleting && 'opacity-50',
+                )}>
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex gap-4">
@@ -116,8 +151,8 @@ export function MeetingsList({ events }: MeetingsListProps) {
                       {/* Status & Actions */}
                       <div className="flex items-center gap-2">
                         {audit && (
-                          <Badge 
-                            variant="outline" 
+                          <Badge
+                            variant="outline"
                             className={cn(
                               'gap-1',
                               audit.status === 'approved' && 'text-green-600 bg-green-50 border-green-200',
@@ -149,6 +184,15 @@ export function MeetingsList({ events }: MeetingsListProps) {
                             </a>
                           </Button>
                         )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(event.id, event.title)}
+                          disabled={isDeleting}
+                          className="text-muted-foreground hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                         <Button asChild variant="outline" size="sm">
                           <Link href={`/dashboard/meetings/${event.id}`}>
                             Workspace
