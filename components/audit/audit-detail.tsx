@@ -27,6 +27,7 @@ import {
   Send,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 
 type Verdict = 'keep' | 'shorten' | 'asyncify' | 'delegate' | 'cancel' | 'needs_context'
 type AuditStatus = 'pending' | 'approved' | 'rejected' | 'executed' | 'expired'
@@ -104,7 +105,7 @@ export function AuditDetail({ audit }: AuditDetailProps) {
   async function handleApprove() {
     setIsApproving(true)
     const supabase = createClient()
-    
+
     const { error } = await supabase
       .from('meeting_audits')
       .update({
@@ -114,10 +115,33 @@ export function AuditDetail({ audit }: AuditDetailProps) {
       })
       .eq('id', audit.id)
 
-    if (!error) {
-      router.push('/dashboard')
-      router.refresh()
+    if (error) {
+      setIsApproving(false)
+      return
     }
+
+    // Execute the calendar action (cancel, shorten, etc.)
+    try {
+      const res = await fetch(`/api/audits/${audit.id}/execute`, { method: 'POST' })
+      const data = await res.json()
+
+      if (data.executed) {
+        toast.success(`Action executed: ${audit.verdict}`, {
+          description: data.result?.action === 'shortened'
+            ? `Meeting shortened from ${data.result.originalMinutes}min to ${data.result.newMinutes}min`
+            : `Calendar event has been updated`,
+        })
+      } else if (data.message) {
+        toast.info(data.message)
+      } else if (data.error) {
+        toast.error('Execution failed', { description: data.error })
+      }
+    } catch {
+      toast.error('Could not execute calendar action')
+    }
+
+    router.push('/dashboard')
+    router.refresh()
     setIsApproving(false)
   }
 

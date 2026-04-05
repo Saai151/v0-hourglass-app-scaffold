@@ -20,7 +20,7 @@ export async function GET(request: Request) {
   }
 
   // Check if user granted the calendar scope
-  if (!grantedScope.includes('calendar.readonly')) {
+  if (!grantedScope.includes('calendar.events') && !grantedScope.includes('calendar.readonly')) {
     return NextResponse.redirect(
       `${BASE_URL}/dashboard/integrations?error=missing_calendar_scope`,
     )
