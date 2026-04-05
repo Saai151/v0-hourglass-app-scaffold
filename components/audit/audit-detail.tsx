@@ -10,11 +10,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
+import {
   ArrowLeft,
-  Calendar, 
-  Clock, 
-  Users, 
+  Calendar,
+  Clock,
+  Users,
   Mail,
   MessageSquare,
   ExternalLink,
@@ -23,7 +23,8 @@ import {
   AlertTriangle,
   Sparkles,
   Copy,
-  Check
+  Check,
+  Send,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -140,6 +141,16 @@ export function AuditDetail({ audit }: AuditDetailProps) {
     navigator.clipboard.writeText(text)
     setCopiedField(field)
     setTimeout(() => setCopiedField(null), 2000)
+  }
+
+  function openMailto() {
+    const to = event.attendees
+      ?.filter((a) => a.email !== event.organizer_email)
+      .map((a) => a.email)
+      .join(',') || ''
+    const subject = encodeURIComponent(`Re: ${event.title}`)
+    const body = encodeURIComponent(audit.draft_email || '')
+    window.open(`mailto:${to}?subject=${subject}&body=${body}`, '_self')
   }
 
   return (
@@ -300,7 +311,7 @@ export function AuditDetail({ audit }: AuditDetailProps) {
                   </TabsList>
                   
                   {audit.draft_email && (
-                    <TabsContent value="email" className="mt-4">
+                    <TabsContent value="email" className="mt-4 space-y-3">
                       <div className="relative">
                         <Textarea
                           defaultValue={audit.draft_email}
@@ -319,6 +330,10 @@ export function AuditDetail({ audit }: AuditDetailProps) {
                           )}
                         </Button>
                       </div>
+                      <Button onClick={openMailto} className="gap-2">
+                        <Send className="h-4 w-4" />
+                        Send Email to Attendees
+                      </Button>
                     </TabsContent>
                   )}
                   
