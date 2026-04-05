@@ -183,8 +183,8 @@ export function InboxList({ audits }: InboxListProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Bulk actions bar */}
-      <div className="flex items-center justify-between">
+      {/* Bulk actions bar — fixed height to prevent layout shift */}
+      <div className="flex items-center justify-between h-9">
         <label className="flex items-center gap-2 cursor-pointer">
           <Checkbox
             checked={allSelected}
@@ -194,40 +194,41 @@ export function InboxList({ audits }: InboxListProps) {
             {allSelected ? 'Deselect all' : 'Select all'}
           </span>
         </label>
-        {someSelected && (
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">
-              {selected.size} selected
-            </span>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleBulkReject}
-              disabled={isBulkActioning}
-              className="gap-2"
-            >
-              {isBulkRejecting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <XCircle className="h-4 w-4" />
-              )}
-              {isBulkRejecting ? 'Rejecting...' : `Reject ${selected.size}`}
-            </Button>
-            <Button
-              size="sm"
-              onClick={handleBulkApprove}
-              disabled={isBulkActioning}
-              className="gap-2"
-            >
-              {isBulkApproving ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <CheckCircle className="h-4 w-4" />
-              )}
-              {isBulkApproving ? 'Approving...' : `Approve ${selected.size}`}
-            </Button>
-          </div>
-        )}
+        <div className={cn(
+          'flex items-center gap-3 transition-opacity',
+          someSelected ? 'opacity-100' : 'opacity-0 pointer-events-none',
+        )}>
+          <span className="text-sm text-muted-foreground">
+            {selected.size} selected
+          </span>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleBulkReject}
+            disabled={isBulkActioning}
+            className="gap-2"
+          >
+            {isBulkRejecting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <XCircle className="h-4 w-4" />
+            )}
+            {isBulkRejecting ? 'Rejecting...' : `Reject ${selected.size}`}
+          </Button>
+          <Button
+            size="sm"
+            onClick={handleBulkApprove}
+            disabled={isBulkActioning}
+            className="gap-2"
+          >
+            {isBulkApproving ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <CheckCircle className="h-4 w-4" />
+            )}
+            {isBulkApproving ? 'Approving...' : `Approve ${selected.size}`}
+          </Button>
+        </div>
       </div>
 
       {audits.map((audit) => {
