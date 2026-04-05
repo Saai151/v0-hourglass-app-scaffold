@@ -195,11 +195,11 @@ export function InboxList({ audits }: InboxListProps) {
           </span>
         </label>
         <div className={cn(
-          'flex items-center gap-3 transition-opacity',
-          someSelected ? 'opacity-100' : 'opacity-0 pointer-events-none',
+          'flex items-center gap-3',
+          someSelected ? 'visible' : 'invisible',
         )}>
           <span className="text-sm text-muted-foreground">
-            {selected.size} selected
+            {selected.size || 1} selected
           </span>
           <Button
             size="sm"
