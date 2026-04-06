@@ -119,7 +119,8 @@ export function IntegrationCard({ integration }: IntegrationCardProps) {
       const res = await fetch('/api/integrations/google-calendar/sync', { method: 'POST' })
       const data = await res.json()
       if (res.ok) {
-        toast.success(`Synced ${data.synced} events from Google Calendar.`, {
+        const docsMsg = data.docs_found ? ` Found ${data.docs_found} related Google Docs.` : ''
+        toast.success(`Synced ${data.synced} events from Google Calendar.${docsMsg}`, {
           action: {
             label: 'View Meetings',
             onClick: () => router.push('/dashboard/meetings'),
