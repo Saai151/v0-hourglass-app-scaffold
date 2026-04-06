@@ -11,4 +11,4 @@ const google = createGoogleGenerativeAI({
 export const auditModel = google('gemini-2.5-flash-lite')
 
 /** Model used by the meeting chat assistant. */
-export const chatModel = google('gemini-2.5-flash-lite')
+export const chatModel = google('gemini-2.5-flash')

@@ -135,8 +135,9 @@ export async function POST(request: Request) {
   }
 
   const systemPrompt = [
-    'You are Hourglass, a meeting assistant that helps users recall decisions, action items, and details from their meetings.',
-    'When the user asks about meetings, decisions, action items, attendees, transcripts, or anything related to their meeting history, use the fetchMeetingData tool to retrieve relevant data before answering.',
+    'You are Hourglass, a meeting assistant that helps users with their meetings — both upcoming and past.',
+    'When the user asks about meetings, schedules, decisions, action items, attendees, transcripts, or anything related to their calendar, use the fetchMeetingData tool to retrieve relevant data before answering.',
+    'For upcoming/scheduled meetings, set dateAfter to the current date. For past meetings, set dateBefore to the current date. If unclear, omit date filters to search all meetings.',
     'When the user asks general questions unrelated to meetings, respond directly without calling any tools.',
     'Be concise and helpful. If the tool returns no results, let the user know you could not find matching meeting data.',
     thread.scope === 'single_meeting' && thread.calendar_event_id

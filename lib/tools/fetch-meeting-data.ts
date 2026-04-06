@@ -19,7 +19,7 @@ type RetrievedChunk = MeetingChunk & {
 }
 
 const fetchMeetingDataInputSchema = z.object({
-  searchQuery: z.string().describe('Keywords to search in meeting summaries, notes, and transcripts'),
+  searchQuery: z.string().optional().default('').describe('Keywords to search in meeting summaries, notes, and transcripts. Leave empty to list all matching meetings.'),
   meetingTitle: z.string().optional().describe('Filter by meeting title (partial match)'),
   dateAfter: z.string().optional().describe('ISO date string — only include meetings after this date'),
   dateBefore: z.string().optional().describe('ISO date string — only include meetings before this date'),
@@ -63,9 +63,11 @@ export function createFetchMeetingDataTool(
 ) {
   return tool({
     description:
-      'Query meeting summaries, notes, transcripts, decisions, and action items from the database. ' +
-      'Call this tool when the user asks about specific meetings, decisions, action items, attendees, ' +
-      'or anything related to their meeting history.',
+      'Query calendar events, meeting summaries, notes, transcripts, decisions, and action items from the database. ' +
+      'Call this tool for both upcoming/scheduled meetings and past meetings. ' +
+      'To list upcoming meetings, just set dateAfter to today — no searchQuery needed. ' +
+      'For past meetings, set dateBefore to today. ' +
+      'Call this tool when the user asks about their schedule, specific meetings, decisions, action items, or attendees.',
     inputSchema: fetchMeetingDataInputSchema,
     execute: async ({ searchQuery, meetingTitle, dateAfter, dateBefore }) => {
       const terms = extractSearchTerms(searchQuery)
