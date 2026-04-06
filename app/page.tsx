@@ -114,14 +114,25 @@ export default async function HomePage() {
 
       {/* Demo Videos */}
       <DemoVideoSection
-        heading="Audit your calendar in seconds"
-        description="Hourglass reviews each meeting, gathers context from emails and Slack, and delivers smart recommendations straight to your inbox."
-        videoSrc="/Demo1.mp4"
+        heading="Connect Google Calendar in one click"
+        description="Link your Google account and sync your calendar — Hourglass instantly pulls in all your upcoming meetings and their context."
+        videoSrc="/GoogleDemo.mp4"
       />
       <DemoVideoSection
-        heading="Ask anything about your meetings"
-        description="Upload transcripts or notes and ask questions across all your meetings. Get grounded answers with citations back to the source material."
-        videoSrc="/Demo2.mp4"
+        heading="Audit your calendar in seconds"
+        description="Run an AI-powered audit on any meeting. Hourglass analyzes attendees, agendas, and history to tell you whether to keep, shorten, or cancel."
+        videoSrc="/Demo1.mp4"
+        reversed
+      />
+      <DemoVideoSection
+        heading="Act on recommendations automatically"
+        description="Review audit insights, approve a cancellation, and let Hourglass draft and send the email to attendees — all from one screen."
+        videoSrc="/Email.mp4"
+      />
+      <DemoVideoSection
+        heading="Chat with your meeting notes"
+        description="Google Docs linked to your meetings are pulled into context automatically. Ask questions about decisions, action items, or anything discussed."
+        videoSrc="/final.mp4"
         reversed
       />
 
