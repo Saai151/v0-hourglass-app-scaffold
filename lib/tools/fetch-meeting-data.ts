@@ -9,6 +9,11 @@ import type {
   MeetingSummary,
 } from '@/lib/types'
 
+type RetrievedEvent = Pick<
+  CalendarEvent,
+  'id' | 'title' | 'start_time' | 'end_time' | 'organizer_email' | 'attendees' | 'description'
+>
+
 type RetrievedSummary = MeetingSummary & {
   calendar_event: Pick<CalendarEvent, 'id' | 'title' | 'start_time' | 'end_time'>
 }
@@ -26,6 +31,50 @@ const fetchMeetingDataInputSchema = z.object({
 })
 
 export type FetchMeetingDataInput = z.infer<typeof fetchMeetingDataInputSchema>
+
+function getAttendeeText(attendees: CalendarEvent['attendees']) {
+  if (!Array.isArray(attendees)) return ''
+
+  return attendees
+    .map((attendee) => {
+      if (!attendee || typeof attendee !== 'object') return ''
+      const name = 'name' in attendee && typeof attendee.name === 'string' ? attendee.name : ''
+      const email = 'email' in attendee && typeof attendee.email === 'string' ? attendee.email : ''
+      return [name, email].filter(Boolean).join(' ')
+    })
+    .filter(Boolean)
+    .join(' ')
+}
+
+function rankEvents(events: RetrievedEvent[], terms: string[]) {
+  return events
+    .map((event) => ({
+      event,
+      score: keywordScore(
+        toSearchText([
+          event.title,
+          event.description,
+          event.organizer_email,
+          getAttendeeText(event.attendees),
+        ]),
+        terms,
+      ),
+    }))
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score
+      return new Date(a.event.start_time).getTime() - new Date(b.event.start_time).getTime()
+    })
+}
+
+function isBroadMeetingQuery(searchQuery: string) {
+  const normalized = searchQuery.toLowerCase()
+
+  return (
+    /\b(what|which|list|show|tell)\b.*\b(meeting|meetings|calendar|schedule)\b/.test(normalized) ||
+    /\b(upcoming|today|tomorrow|this week|next week)\b/.test(normalized) ||
+    /\b(my calendar|my schedule|meetings do i have)\b/.test(normalized)
+  )
+}
 
 function rankSummaries(summaries: RetrievedSummary[], terms: string[]) {
   return summaries
@@ -63,12 +112,13 @@ export function createFetchMeetingDataTool(
 ) {
   return tool({
     description:
-      'Query meeting summaries, notes, transcripts, decisions, and action items from the database. ' +
-      'Call this tool when the user asks about specific meetings, decisions, action items, attendees, ' +
+      'Query meetings, calendar details, summaries, notes, transcripts, decisions, and action items from the database. ' +
+      'Call this tool when the user asks about upcoming meetings, schedules, specific meetings, decisions, action items, attendees, ' +
       'or anything related to their meeting history.',
     inputSchema: fetchMeetingDataInputSchema,
     execute: async ({ searchQuery, meetingTitle, dateAfter, dateBefore }) => {
       const terms = extractSearchTerms(searchQuery)
+      const broadMeetingQuery = isBroadMeetingQuery(searchQuery)
 
       // --- Calendar events (for date/title filtering) ---
       let eventsQuery = supabase
@@ -93,6 +143,10 @@ export function createFetchMeetingDataTool(
 
       const { data: events } = await eventsQuery
       const eventIds = (events ?? []).map((e: { id: string }) => e.id)
+      const rankedEvents = rankEvents((events ?? []) as RetrievedEvent[], terms)
+      const topEvents = rankedEvents
+        .filter(({ score }, index) => score > 0 || broadMeetingQuery || index < 3)
+        .slice(0, broadMeetingQuery ? 8 : 5)
 
       // --- Summaries ---
       let summariesQuery = supabase
@@ -134,9 +188,35 @@ export function createFetchMeetingDataTool(
       const { data: chunksData } = await chunksQuery
       const rankedChunks = rankChunks((chunksData ?? []) as RetrievedChunk[], terms)
       const topChunks = rankedChunks.filter((r, i) => r.score > 0 || i < 4).slice(0, 6)
+      const includeEventResults =
+        broadMeetingQuery || (topSummaries.length === 0 && topChunks.length === 0 && topEvents.length > 0)
 
       // --- Build structured output for the LLM ---
       const results = [
+        ...(includeEventResults
+          ? topEvents.map(({ event }) => ({
+              type: 'event' as const,
+              meetingId: event.id,
+              meetingTitle: event.title,
+              meetingTime: event.start_time,
+              meetingEndTime: event.end_time,
+              organizerEmail: event.organizer_email,
+              attendees: Array.isArray(event.attendees)
+                ? event.attendees.map((attendee) => {
+                    if (!attendee || typeof attendee !== 'object') return ''
+                    const name =
+                      'name' in attendee && typeof attendee.name === 'string' ? attendee.name : ''
+                    const email =
+                      'email' in attendee && typeof attendee.email === 'string'
+                        ? attendee.email
+                        : ''
+                    return name || email
+                  })
+                : [],
+              description: event.description,
+              excerpt: excerptText(event.description || event.title),
+            }))
+          : []),
         ...topSummaries.map(({ summary }) => ({
           type: 'summary' as const,
           meetingTitle: summary.calendar_event.title,

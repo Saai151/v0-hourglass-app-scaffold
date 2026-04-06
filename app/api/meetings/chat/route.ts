@@ -137,6 +137,7 @@ export async function POST(request: Request) {
   const systemPrompt = [
     'You are Hourglass, a meeting assistant that helps users recall decisions, action items, and details from their meetings.',
     'When the user asks about meetings, decisions, action items, attendees, transcripts, or anything related to their meeting history, use the fetchMeetingData tool to retrieve relevant data before answering.',
+    'The tool may return calendar event results for broad listing or schedule questions, and summary or chunk results for note-based questions. Use whichever results are returned instead of saying nothing was found.',
     'When the user asks general questions unrelated to meetings, respond directly without calling any tools.',
     'Be concise and helpful. If the tool returns no results, let the user know you could not find matching meeting data.',
     thread.scope === 'single_meeting' && thread.calendar_event_id
@@ -180,4 +181,52 @@ export async function POST(request: Request) {
       }
     },
   })
+}
+
+export async function DELETE(request: Request) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
+  }
+
+  const url = new URL(request.url)
+  const threadId = url.searchParams.get('threadId')
+
+  if (!threadId) {
+    return new Response(JSON.stringify({ error: 'threadId is required' }), { status: 400 })
+  }
+
+  const { data: thread, error: lookupError } = await supabase
+    .from('meeting_chat_threads')
+    .select('id')
+    .eq('id', threadId)
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (lookupError) {
+    if (isMissingMeetingChatSchemaError(lookupError)) return missingMeetingChatSchemaResponse()
+    return new Response(JSON.stringify({ error: lookupError.message }), { status: 500 })
+  }
+
+  if (!thread) {
+    return new Response(JSON.stringify({ error: 'Chat thread not found' }), { status: 404 })
+  }
+
+  const { error: deleteError } = await supabase
+    .from('meeting_chat_threads')
+    .delete()
+    .eq('id', threadId)
+    .eq('user_id', user.id)
+
+  if (deleteError) {
+    if (isMissingMeetingChatSchemaError(deleteError)) return missingMeetingChatSchemaResponse()
+    return new Response(JSON.stringify({ error: deleteError.message }), { status: 500 })
+  }
+
+  return new Response(null, { status: 204 })
 }

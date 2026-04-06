@@ -307,7 +307,7 @@ export interface AuditRunResponse {
 }
 
 export interface MeetingDocumentUpsertRequest {
-  title: string
+  title?: string
   document_type: MeetingDocumentType
   content: string
   source_metadata?: Record<string, unknown>

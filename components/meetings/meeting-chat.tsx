@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { formatDistanceToNow } from 'date-fns'
@@ -14,15 +14,48 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Textarea } from '@/components/ui/textarea'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
-import { MessageSquarePlus, Send, Loader2, Database } from 'lucide-react'
+import { toast } from 'sonner'
+import { MessageSquarePlus, Send, Loader2, Database, Trash2 } from 'lucide-react'
 
 interface MeetingChatSidebarProps {
   threads: MeetingChatThread[]
 }
 
 export function MeetingChatSidebar({ threads }: MeetingChatSidebarProps) {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const selectedThreadId = searchParams.get('threadId') ?? undefined
+  const [deletingThreadId, setDeletingThreadId] = useState<string | null>(null)
+
+  async function handleDelete(thread: MeetingChatThread) {
+    const confirmed = window.confirm(`Delete "${thread.title}"?`)
+    if (!confirmed) return
+
+    setDeletingThreadId(thread.id)
+
+    try {
+      const response = await fetch(`/api/meetings/chat?threadId=${thread.id}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        const payload = (await response.json().catch(() => null)) as { error?: string } | null
+        throw new Error(payload?.error ?? 'Failed to delete chat thread')
+      }
+
+      toast.success(`Deleted "${thread.title}".`)
+
+      if (selectedThreadId === thread.id) {
+        router.replace('/dashboard/chat')
+      } else {
+        router.refresh()
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete chat thread')
+    } finally {
+      setDeletingThreadId((current) => (current === thread.id ? null : current))
+    }
+  }
 
   return (
     <aside className="hidden lg:flex w-80 border-r bg-card flex-col shrink-0">
@@ -42,24 +75,54 @@ export function MeetingChatSidebar({ threads }: MeetingChatSidebarProps) {
       </div>
       <ScrollArea className="flex-1 min-h-0">
         <div className="p-3 space-y-2">
-          {threads.map((thread) => (
-            <Link
-              key={thread.id}
-              href={`/dashboard/chat?threadId=${thread.id}`}
-              className={cn(
-                'block rounded-lg border p-3 transition-colors hover:border-primary/40',
-                selectedThreadId === thread.id && 'border-primary bg-primary/5',
-              )}
-            >
-              <p className="font-medium text-sm">{thread.title}</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {formatDistanceToNow(new Date(thread.updated_at), { addSuffix: true })}
-              </p>
-              <Badge variant="secondary" className="mt-2">
-                {thread.scope === 'single_meeting' ? 'Single meeting' : 'Cross meeting'}
-              </Badge>
-            </Link>
-          ))}
+          {threads.map((thread) => {
+            const isDeleting = deletingThreadId === thread.id
+
+            return (
+              <div
+                key={thread.id}
+                className={cn(
+                  'group relative rounded-lg border transition-colors hover:border-primary/40',
+                  selectedThreadId === thread.id && 'border-primary bg-primary/5',
+                  isDeleting && 'opacity-60',
+                )}
+              >
+                <Link
+                  href={`/dashboard/chat?threadId=${thread.id}`}
+                  className="block p-3 pr-12"
+                  aria-disabled={isDeleting}
+                >
+                  <p className="font-medium text-sm">{thread.title}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {formatDistanceToNow(new Date(thread.updated_at), { addSuffix: true })}
+                  </p>
+                  <Badge variant="secondary" className="mt-2">
+                    {thread.scope === 'single_meeting' ? 'Single meeting' : 'Cross meeting'}
+                  </Badge>
+                </Link>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+                  disabled={isDeleting}
+                  onClick={(event) => {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    void handleDelete(thread)
+                  }}
+                  aria-label={`Delete ${thread.title}`}
+                  title="Delete thread"
+                >
+                  {isDeleting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            )
+          })}
         </div>
       </ScrollArea>
     </aside>

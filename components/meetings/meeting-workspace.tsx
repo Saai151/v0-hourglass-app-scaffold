@@ -71,8 +71,8 @@ export function MeetingWorkspace({
   const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(eventId: string) {
-    if (!title.trim() || !content.trim()) {
-      setError('Add a title and some meeting text first.')
+    if (!content.trim()) {
+      setError('Add some meeting text first.')
       return
     }
 
@@ -245,7 +245,7 @@ export function MeetingWorkspace({
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium" htmlFor="document-title">
-                    Title
+                    Title <span className="text-muted-foreground">(optional)</span>
                   </label>
                   <Input
                     id="document-title"
@@ -253,6 +253,9 @@ export function MeetingWorkspace({
                     onChange={(event) => setTitle(event.target.value)}
                     placeholder="Sprint planning transcript"
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Leave blank to auto-generate a title from the meeting name and document type.
+                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -272,7 +275,7 @@ export function MeetingWorkspace({
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium" htmlFor="document-file">
-                    Load from file
+                    Load from file <span className="text-muted-foreground">(optional)</span>
                   </label>
                   <Input
                     id="document-file"
@@ -293,6 +296,9 @@ export function MeetingWorkspace({
                     className="min-h-[280px]"
                     placeholder="Paste the meeting transcript or notes here..."
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Pasting notes here is enough. You only need a file if you want to import one.
+                  </p>
                 </div>
 
                 {error && <p className="text-sm text-red-600">{error}</p>}

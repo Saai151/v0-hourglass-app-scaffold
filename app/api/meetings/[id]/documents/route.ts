@@ -11,6 +11,10 @@ interface RouteParams {
   params: Promise<{ id: string }>
 }
 
+function buildDefaultDocumentTitle(event: CalendarEvent, documentType: 'transcript' | 'notes') {
+  return `${event.title} ${documentType}`
+}
+
 async function getAuthedEvent(eventId: string) {
   const supabase = await createClient()
   const {
@@ -92,13 +96,13 @@ export async function POST(request: Request, { params }: RouteParams) {
   }
 
   const body = (await request.json().catch(() => null)) as MeetingDocumentUpsertRequest | null
-  const title = body?.title?.trim()
+  const title = body?.title?.trim() || buildDefaultDocumentTitle(event, body?.document_type ?? 'notes')
   const content = body?.content?.trim()
   const documentType = body?.document_type
 
-  if (!title || !content || !documentType || !['transcript', 'notes'].includes(documentType)) {
+  if (!content || !documentType || !['transcript', 'notes'].includes(documentType)) {
     return NextResponse.json(
-      { error: 'title, content, and a valid document_type are required' },
+      { error: 'content and a valid document_type are required' },
       { status: 400 }
     )
   }
