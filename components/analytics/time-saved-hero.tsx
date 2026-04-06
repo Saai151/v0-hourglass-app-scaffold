@@ -18,12 +18,10 @@ export function TimeSavedHero({ hoursSaved, meetingsActioned, meetingsAudited }:
             <p className="text-sm font-medium text-muted-foreground mb-1">
               Time saved this week
             </p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-bold tracking-tight">
-                {hoursSaved.toFixed(1)}
-              </span>
-              <span className="text-lg text-muted-foreground">hours</span>
-            </div>
+            <p className="text-4xl font-bold tracking-tight tabular-nums">
+              {hoursSaved.toFixed(1)}{' '}
+              <span className="text-lg font-normal text-muted-foreground">hours</span>
+            </p>
             <p className="text-sm text-muted-foreground mt-2">
               {meetingsActioned} meeting{meetingsActioned !== 1 ? 's' : ''} actioned
               {' '}&middot;{' '}
