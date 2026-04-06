@@ -198,16 +198,21 @@ export function MeetingChatConversation({
         <div className="max-w-4xl mx-auto space-y-4">
           {messages.length > 0 ? (
             messages.map((message) => (
-              <Card
+              <div
                 key={message.id}
                 className={cn(
-                  message.role === 'assistant' ? 'bg-card' : 'bg-muted border-border',
+                  'flex',
+                  message.role === 'user' ? 'justify-end' : 'justify-start',
                 )}
               >
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm capitalize">{message.role}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
+                <div
+                  className={cn(
+                    'max-w-[80%] rounded-2xl px-4 py-3 space-y-2',
+                    message.role === 'user'
+                      ? 'bg-foreground text-background rounded-br-md'
+                      : 'bg-muted text-foreground rounded-bl-md',
+                  )}
+                >
                   {message.parts.map((part, i) => {
                     if (part.type === 'text') {
                       return (
@@ -221,8 +226,8 @@ export function MeetingChatConversation({
                     }
                     return null
                   })}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))
           ) : (
             <Card>
@@ -237,11 +242,11 @@ export function MeetingChatConversation({
           )}
 
           {isStreaming && messages[messages.length - 1]?.role !== 'assistant' && (
-            <Card className="bg-card">
-              <CardContent className="py-4">
+            <div className="flex justify-start">
+              <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-3">
                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
 
           {error && (
