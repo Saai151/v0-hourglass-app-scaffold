@@ -1,6 +1,6 @@
 import { generateId, type UIMessage } from 'ai'
 import { createClient } from '@/lib/supabase/server'
-import { MeetingChat } from '@/components/meetings/meeting-chat'
+import { MeetingChatConversation } from '@/components/meetings/meeting-chat'
 import type { MeetingChatMessage } from '@/lib/types'
 
 interface MeetingChatPageProps {
@@ -31,17 +31,14 @@ export default async function MeetingChatPage({ searchParams }: MeetingChatPageP
     return null
   }
 
-  const { data: threads } = await supabase
-    .from('meeting_chat_threads')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('updated_at', { ascending: false })
-    .limit(25)
-
-  const activeThread =
-    threads?.find((thread) => thread.id === threadId) ??
-    threads?.[0] ??
-    null
+  const { data: activeThread } = threadId
+    ? await supabase
+        .from('meeting_chat_threads')
+        .select('*')
+        .eq('id', threadId)
+        .eq('user_id', user.id)
+        .maybeSingle()
+    : { data: null }
 
   const [{ data: messages }, { data: focusedMeeting }] = await Promise.all([
     activeThread
@@ -64,12 +61,11 @@ export default async function MeetingChatPage({ searchParams }: MeetingChatPageP
 
   const uiMessages = toUIMessages((messages ?? []) as MeetingChatMessage[])
 
-  const chatKey = activeThread?.id ?? meetingId ?? 'new'
+  const conversationKey = activeThread?.id ?? meetingId ?? 'new'
 
   return (
-    <MeetingChat
-      key={chatKey}
-      threads={threads ?? []}
+    <MeetingChatConversation
+      key={conversationKey}
       activeThread={activeThread}
       initialMessages={uiMessages}
       focusedMeeting={focusedMeeting}
