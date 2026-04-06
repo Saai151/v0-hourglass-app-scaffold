@@ -1,11 +1,23 @@
+import { generateId, type UIMessage } from 'ai'
 import { createClient } from '@/lib/supabase/server'
-import { MeetingChat } from '@/components/meetings/meeting-chat'
+import { MeetingChatConversation } from '@/components/meetings/meeting-chat'
+import type { MeetingChatMessage } from '@/lib/types'
 
 interface MeetingChatPageProps {
   searchParams: Promise<{
     threadId?: string
     meetingId?: string
   }>
+}
+
+function toUIMessages(rows: MeetingChatMessage[]): UIMessage[] {
+  return rows
+    .filter((row) => row.role === 'user' || row.role === 'assistant')
+    .map((row) => ({
+      id: row.id ?? generateId(),
+      role: row.role as 'user' | 'assistant',
+      parts: [{ type: 'text' as const, text: row.content }],
+    }))
 }
 
 export default async function MeetingChatPage({ searchParams }: MeetingChatPageProps) {
@@ -19,17 +31,14 @@ export default async function MeetingChatPage({ searchParams }: MeetingChatPageP
     return null
   }
 
-  const { data: threads } = await supabase
-    .from('meeting_chat_threads')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('updated_at', { ascending: false })
-    .limit(25)
-
-  const activeThread =
-    threads?.find((thread) => thread.id === threadId) ??
-    threads?.[0] ??
-    null
+  const { data: activeThread } = threadId
+    ? await supabase
+        .from('meeting_chat_threads')
+        .select('*')
+        .eq('id', threadId)
+        .eq('user_id', user.id)
+        .maybeSingle()
+    : { data: null }
 
   const [{ data: messages }, { data: focusedMeeting }] = await Promise.all([
     activeThread
@@ -50,11 +59,15 @@ export default async function MeetingChatPage({ searchParams }: MeetingChatPageP
       : Promise.resolve({ data: null }),
   ])
 
+  const uiMessages = toUIMessages((messages ?? []) as MeetingChatMessage[])
+
+  const conversationKey = activeThread?.id ?? meetingId ?? 'new'
+
   return (
-    <MeetingChat
-      threads={threads ?? []}
+    <MeetingChatConversation
+      key={conversationKey}
       activeThread={activeThread}
-      initialMessages={messages ?? []}
+      initialMessages={uiMessages}
       focusedMeeting={focusedMeeting}
     />
   )

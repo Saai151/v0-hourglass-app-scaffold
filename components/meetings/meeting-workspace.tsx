@@ -24,6 +24,22 @@ interface MeetingWorkspaceProps {
   summary?: MeetingSummary | null
 }
 
+async function readResponsePayload(response: Response) {
+  const text = await response.text()
+
+  if (!text) {
+    return null
+  }
+
+  try {
+    return JSON.parse(text) as Record<string, unknown>
+  } catch {
+    return {
+      error: text,
+    }
+  }
+}
+
 function SectionList({ title, items }: { title: string; items: string[] }) {
   if (items.length === 0) return null
 
@@ -76,9 +92,13 @@ export function MeetingWorkspace({
         }),
       })
 
-      const payload = await response.json()
+      const payload = await readResponsePayload(response)
       if (!response.ok) {
-        throw new Error(payload.error || 'Failed to upload meeting document')
+        throw new Error(
+          typeof payload?.error === 'string'
+            ? payload.error
+            : 'Failed to upload meeting document'
+        )
       }
 
       setTitle('')
