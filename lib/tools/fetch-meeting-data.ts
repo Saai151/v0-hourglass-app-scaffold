@@ -135,6 +135,28 @@ export function createFetchMeetingDataTool(
       const rankedChunks = rankChunks((chunksData ?? []) as RetrievedChunk[], terms)
       const topChunks = rankedChunks.filter((r, i) => r.score > 0 || i < 4).slice(0, 6)
 
+      // --- Documents (Google Drive docs, uploaded notes) ---
+      let docsQuery = supabase
+        .from('meeting_documents')
+        .select('*, calendar_event:calendar_events(id, title, start_time, end_time)')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(20)
+
+      if (eventIds.length > 0) {
+        docsQuery = docsQuery.in('calendar_event_id', eventIds)
+      }
+
+      const { data: docsData } = await docsQuery
+      const documents = (docsData ?? []) as Array<{
+        id: string
+        title: string
+        document_type: string
+        content: string
+        source_metadata: Record<string, unknown>
+        calendar_event: { id: string; title: string; start_time: string; end_time: string }
+      }>
+
       // --- Build structured output for the LLM ---
       const results = [
         ...topSummaries.map(({ summary }) => ({
@@ -156,6 +178,16 @@ export function createFetchMeetingDataTool(
           documentType: chunk.meeting_document.document_type,
           content: chunk.content,
           excerpt: excerptText(chunk.content),
+        })),
+        ...documents.map((doc) => ({
+          type: 'document' as const,
+          meetingTitle: doc.calendar_event.title,
+          meetingTime: doc.calendar_event.start_time,
+          documentTitle: doc.title,
+          documentType: doc.document_type,
+          source: (doc.source_metadata?.source as string) || 'manual',
+          content: doc.content.slice(0, 4000),
+          excerpt: excerptText(doc.content),
         })),
       ]
 
