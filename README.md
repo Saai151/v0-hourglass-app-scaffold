@@ -1,35 +1,29 @@
-# v0-hourglass-app-scaffold
+# Hourglass
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
+AI-powered meeting ops assistant that audits your calendar, surfaces what's wasting your time, and takes action with your approval.
 
-## Built with v0
+## Features
 
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
+- **Calendar sync** — Connect Google Calendar in one click to pull in all upcoming meetings and context
+- **AI meeting audits** — Analyze attendees, agendas, and history to recommend whether to keep, shorten, or cancel
+- **One-click actions** — Approve a recommendation and Hourglass drafts and sends the email to attendees
+- **Meeting chat** — Ask questions across your meeting notes, transcripts, and linked Google Docs
+- **Smart inbox** — Pending audit recommendations in one place, sorted by priority
+- **Dark mode** — Full light/dark theme support
 
-[Continue working on v0 →](https://v0.app/chat/projects/prj_EhTBccV1jhR3EMLJB2TS87s76X3b)
+## Tech stack
 
-## Getting Started
+- **Framework:** Next.js 15 (App Router)
+- **Auth & database:** Supabase
+- **AI:** Vercel AI SDK + Google Gemini
+- **UI:** Tailwind CSS, shadcn/ui, react-resizable-panels
+- **Integrations:** Google Calendar, Google Drive
 
-First, run the development server:
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-## Learn More
-
-To learn more, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
-
-<a href="https://v0.app/chat/api/kiro/clone/Saai151/v0-hourglass-app-scaffold" alt="Open in Kiro"><img src="https://pdgvvgmkdvyeydso.public.blob.vercel-storage.com/open%20in%20kiro.svg?sanitize=true" /></a>
+Open [http://localhost:3000](http://localhost:3000) to see the app.
