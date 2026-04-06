@@ -3,15 +3,13 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { HourglassIcon } from '@/components/icons'
-import { 
-  ArrowRight, 
-  Calendar, 
-  Clock, 
-  Mail, 
-  MessageSquare, 
+import { AppShowcase } from '@/components/landing/app-showcase'
+import { DemoVideoSection } from '@/components/landing/demo-video-section'
+import {
+  ArrowRight,
+  Calendar,
+  MessageSquare,
   Sparkles,
-  Shield,
-  Zap,
   CheckCircle
 } from 'lucide-react'
 
@@ -48,10 +46,6 @@ export default async function HomePage() {
       {/* Hero */}
       <section className="py-28 px-6 animate-slide-up">
         <div className="max-w-[800px] mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/15 text-foreground rounded-full px-4 py-1.5 text-sm font-medium mb-8">
-            <Sparkles className="h-4 w-4" />
-            AI-Powered Meeting Management
-          </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-balance mb-8">
             Reclaim your calendar with{' '}
             <span className="relative">
@@ -60,7 +54,7 @@ export default async function HomePage() {
             </span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10 text-pretty">
-            Hourglass analyzes your meetings, suggests optimizations, and executes actions with your approval. Spend less time in unnecessary meetings.
+            Hourglass is the context layer on top of all your meetings — analyzing, optimizing, executing, reminding, and answering questions so you spend less time in unnecessary meetings.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button asChild size="lg" className="gap-2">
@@ -76,6 +70,13 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Interactive App Demo */}
+      <section className="py-16 px-6">
+        <div className="max-w-[1200px] mx-auto">
+          <AppShowcase />
+        </div>
+      </section>
+
       {/* Features */}
       <section className="py-24 px-6">
         <div className="max-w-[1100px] mx-auto">
@@ -86,7 +87,7 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <FeatureCard
               icon={Calendar}
               title="Connect your calendar"
@@ -102,53 +103,27 @@ export default async function HomePage() {
               title="Approve and execute"
               description="Review suggestions in your inbox, approve with one click, and let Hourglass handle the rest."
             />
-          </div>
-        </div>
-      </section>
-
-      {/* Verdict Types */}
-      <section className="py-24 px-6">
-        <div className="max-w-[1100px] mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Smart recommendations</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Hourglass suggests the best action for each meeting based on context and your preferences
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <VerdictCard title="Keep" description="Meeting is valuable and should proceed as scheduled" />
-            <VerdictCard title="Shorten" description="Meeting could be more efficient with less time" />
-            <VerdictCard title="Make async" description="This discussion could be handled via email or Slack" />
-            <VerdictCard title="Delegate" description="Someone else on your team should attend instead" />
-            <VerdictCard title="Cancel" description="Meeting is not necessary and should be cancelled" />
-            <VerdictCard title="Needs context" description="More information needed to make a recommendation" />
-          </div>
-        </div>
-      </section>
-
-      {/* Trust */}
-      <section className="py-24 px-6">
-        <div className="max-w-[800px] mx-auto text-center">
-          <div className="grid sm:grid-cols-3 gap-8">
-            <TrustCard
-              icon={Shield}
-              title="Secure"
-              description="Your data is encrypted and never shared"
-            />
-            <TrustCard
-              icon={Zap}
-              title="Fast"
-              description="Get recommendations within minutes"
-            />
-            <TrustCard
+            <FeatureCard
               icon={MessageSquare}
-              title="Transparent"
-              description="Full visibility into every decision"
+              title="Ask about your meetings"
+              description="Query your meeting notes, transcripts, and summaries. Get instant answers grounded in your actual meeting data."
             />
           </div>
         </div>
       </section>
+
+      {/* Demo Videos */}
+      <DemoVideoSection
+        heading="Audit your calendar in seconds"
+        description="Hourglass reviews each meeting, gathers context from emails and Slack, and delivers smart recommendations straight to your inbox."
+        videoPlaceholderLabel="Inbox & audit demo"
+      />
+      <DemoVideoSection
+        heading="Ask anything about your meetings"
+        description="Upload transcripts or notes and ask questions across all your meetings. Get grounded answers with citations back to the source material."
+        videoPlaceholderLabel="Meeting chat demo"
+        reversed
+      />
 
       {/* CTA */}
       <section className="py-28 px-6">
@@ -206,40 +181,3 @@ function FeatureCard({
   )
 }
 
-function VerdictCard({ 
-  title, 
-  description 
-}: { 
-  title: string
-  description: string 
-}) {
-  return (
-    <div className="rounded-xl border border-border p-6 bg-card transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-sm">
-      <div className="flex items-center gap-3 mb-2">
-        <span className="w-2 h-2 rounded-full bg-foreground" />
-        <h3 className="font-semibold">{title}</h3>
-      </div>
-      <p className="text-sm text-muted-foreground pl-5">{description}</p>
-    </div>
-  )
-}
-
-function TrustCard({ 
-  icon: Icon, 
-  title, 
-  description 
-}: { 
-  icon: typeof Shield
-  title: string
-  description: string 
-}) {
-  return (
-    <div className="text-center">
-      <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-        <Icon className="h-6 w-6 text-muted-foreground" />
-      </div>
-      <h3 className="font-semibold mb-1">{title}</h3>
-      <p className="text-sm text-muted-foreground">{description}</p>
-    </div>
-  )
-}
