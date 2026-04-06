@@ -279,7 +279,7 @@ function DemoSidebar({ activeTab, onTabChange }: { activeTab: DemoTab; onTabChan
                 <button
                   onClick={() => onTabChange(item.id)}
                   className={cn(
-                    'flex items-center gap-2.5 w-full px-3 py-2 rounded-[10px] transition-all duration-200 ease-out text-left',
+                    'cursor-pointer flex items-center gap-2.5 w-full px-3 py-2 rounded-[10px] transition-all duration-200 ease-out text-left',
                     isActive
                       ? 'bg-primary/10 text-foreground'
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
@@ -323,7 +323,7 @@ function DemoTabBar({ activeTab, onTabChange }: { activeTab: DemoTab; onTabChang
           key={item.id}
           onClick={() => onTabChange(item.id)}
           className={cn(
-            'flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium transition-colors',
+            'cursor-pointer flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium transition-colors',
             activeTab === item.id
               ? 'text-foreground border-b-2 border-foreground'
               : 'text-muted-foreground'
@@ -547,7 +547,7 @@ function DemoChatView() {
                 key={thread.id}
                 onClick={() => setSelectedThread(thread.id)}
                 className={cn(
-                  'rounded-xl border p-2.5 transition-all duration-200 ease-out w-full text-left',
+                  'cursor-pointer rounded-xl border p-2.5 transition-all duration-200 ease-out w-full text-left',
                   selectedThread === thread.id
                     ? 'border-foreground/20 bg-muted'
                     : 'hover:bg-muted/50',

@@ -151,9 +151,9 @@ export default async function HomePage() {
             </span>
           </div>
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
-            <Link href="#" className="hover:text-foreground transition-colors duration-200">Privacy</Link>
-            <Link href="#" className="hover:text-foreground transition-colors duration-200">Terms</Link>
-            <Link href="#" className="hover:text-foreground transition-colors duration-200">Contact</Link>
+            <Link href="#" className="cursor-pointer hover:text-foreground transition-colors duration-200">Privacy</Link>
+            <Link href="#" className="cursor-pointer hover:text-foreground transition-colors duration-200">Terms</Link>
+            <Link href="#" className="cursor-pointer hover:text-foreground transition-colors duration-200">Contact</Link>
           </div>
         </div>
       </footer>
