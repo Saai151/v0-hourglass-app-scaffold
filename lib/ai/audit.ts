@@ -1,9 +1,10 @@
-import { generateText, Output } from 'ai'
-import type { CalendarEvent, UserPreferences } from '@/lib/types'
+import { generateText } from 'ai'
+import type { CalendarEvent, MeetingSummary, UserPreferences } from '@/lib/types'
 import { auditModel } from './client'
 import {
   SYSTEM_PROMPT,
   formatEventForPrompt,
+  formatMeetingNotesForPrompt,
   formatPreferencesForPrompt,
 } from './prompts'
 import { meetingAuditResultSchema, type MeetingAuditResult } from './schemas'
@@ -11,29 +12,32 @@ import { meetingAuditResultSchema, type MeetingAuditResult } from './schemas'
 /**
  * Audits a single calendar event using the configured AI model.
  *
- * Uses the Vercel AI SDK's generateText() with Output.object() which handles
- * structured output and Zod validation — the schema is the single source of
- * truth for both the model output shape and runtime validation.
+ * Uses generateText + manual JSON parsing to avoid provider-level
+ * structured output issues with Groq's json_schema mode.
  */
 export async function auditMeeting(
   event: CalendarEvent,
   userEmail: string | null,
   preferences: UserPreferences | null,
+  meetingSummary?: MeetingSummary | null,
 ): Promise<MeetingAuditResult> {
   const prompt =
     formatEventForPrompt(event, userEmail) +
+    formatMeetingNotesForPrompt(meetingSummary ?? null) +
     formatPreferencesForPrompt(preferences)
 
-  const { output } = await generateText({
+  const { text } = await generateText({
     model: auditModel,
-    output: Output.object({ schema: meetingAuditResultSchema }),
     system: SYSTEM_PROMPT,
     prompt,
   })
 
-  if (!output) {
-    throw new Error('Failed to audit meeting: no output returned')
+  // Extract JSON from the response (handle markdown code blocks)
+  const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) || text.match(/(\{[\s\S]*\})/)
+  if (!jsonMatch) {
+    throw new Error('Failed to audit meeting: no JSON found in response')
   }
 
-  return output
+  const parsed = JSON.parse(jsonMatch[1].trim())
+  return meetingAuditResultSchema.parse(parsed)
 }

@@ -159,11 +159,25 @@ export function createFetchMeetingDataTool(
         })),
       ]
 
-      if (results.length === 0) {
+      // Always include matching calendar events so the LLM can answer
+      // basic questions even when no notes/summaries have been uploaded
+      const eventResults = (events ?? []).map((e: Record<string, unknown>) => ({
+        type: 'event' as const,
+        meetingTitle: e.title as string,
+        meetingTime: e.start_time as string,
+        endTime: e.end_time as string,
+        organizer: e.organizer_email as string,
+        attendees: e.attendees as unknown[],
+        description: e.description as string | null,
+      }))
+
+      const allResults = [...eventResults, ...results]
+
+      if (allResults.length === 0) {
         return { found: false, message: 'No meeting data found matching the query.', results: [] }
       }
 
-      return { found: true, resultCount: results.length, results }
+      return { found: true, resultCount: allResults.length, results: allResults }
     },
   })
 }

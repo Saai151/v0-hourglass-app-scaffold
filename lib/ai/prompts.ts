@@ -1,4 +1,4 @@
-import type { CalendarEvent, UserPreferences } from '@/lib/types'
+import type { CalendarEvent, MeetingSummary, UserPreferences } from '@/lib/types'
 import { format } from 'date-fns'
 
 /**
@@ -17,6 +17,7 @@ Your job: analyze a meeting and decide what should happen to it.
 - External vs internal — external meetings with clients or partners are usually harder to change.
 - Organizer — is the user the organizer or an attendee?
 - Whether a clear agenda or decision exists in the description.
+- Meeting notes or summaries from prior occurrences — past decisions, action items, and open questions are strong signals.
 
 ## Verdicts (YOU HAVE TO PICK EXACTLY ONE)
 - **keep**: The meeting is valuable as-is. Use for: critical decisions, 1:1s with reports, external client meetings, interviews.
@@ -33,7 +34,20 @@ Your job: analyze a meeting and decide what should happen to it.
 - Set confidence between 0.0 and 1.0: high (0.85+) for clear-cut cases, moderate (0.5–0.84) for trade-offs, low (<0.5) for guesses.
 - Risks should name what could go wrong if the recommendation is followed (0–3 items).
 - Proposed actions should be concrete steps that execute if the user approves.
-- The approval_message should be a short, friendly sentence asking the user to approve or reject.`
+- The approval_message should be a short, friendly sentence asking the user to approve or reject.
+
+## Response format
+You MUST respond with a single JSON object (no markdown, no explanation outside the JSON). Use this exact shape:
+{
+  "verdict": "keep" | "shorten" | "asyncify" | "delegate" | "cancel" | "needs_context",
+  "confidence": 0.0 to 1.0,
+  "rationale": "string explaining why",
+  "risks": ["risk1", "risk2"],
+  "draft_email": "string or null",
+  "draft_slack_message": "string or null",
+  "proposed_actions": [{ "type": "shorten|cancel|delegate|convert_async|send_email|send_slack|create_focus_block", "description": "string" }],
+  "approval_message": "string asking user to approve"
+}`
 
 /**
  * Formats a calendar event into a readable block for the prompt.
@@ -87,5 +101,31 @@ export function formatPreferencesForPrompt(
   if (lines.length === 0) return ''
 
   return `\n\nUser preferences:\n${lines.join('\n')}`
+}
+
+/**
+ * Formats meeting notes/summaries as additional context for the audit prompt.
+ */
+export function formatMeetingNotesForPrompt(
+  summary: MeetingSummary | null,
+): string {
+  if (!summary) return ''
+
+  const sections: string[] = [
+    `\n\nMeeting notes (from prior documents):`,
+    `Summary: ${summary.summary}`,
+  ]
+
+  if (summary.decisions.length > 0) {
+    sections.push(`Decisions: ${summary.decisions.join('; ')}`)
+  }
+  if (summary.action_items.length > 0) {
+    sections.push(`Action items: ${summary.action_items.join('; ')}`)
+  }
+  if (summary.open_questions.length > 0) {
+    sections.push(`Open questions: ${summary.open_questions.join('; ')}`)
+  }
+
+  return sections.join('\n')
 }
 
