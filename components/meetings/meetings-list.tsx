@@ -155,8 +155,8 @@ export function MeetingsList({ events }: MeetingsListProps) {
                             variant="outline"
                             className={cn(
                               'gap-1',
-                              audit.status === 'approved' && 'text-foreground bg-muted border-border',
-                              audit.status === 'pending' && 'text-muted-foreground bg-muted border-border'
+                              audit.status === 'approved' && 'text-emerald-700 bg-emerald-50 border-emerald-200',
+                              audit.status === 'pending' && 'text-amber-700 bg-amber-50 border-amber-200'
                             )}
                           >
                             {audit.status === 'approved' ? (
