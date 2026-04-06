@@ -11,11 +11,9 @@ import {
   Link2,
   Settings,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { useState } from 'react'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { useSidebarCollapsed } from '@/components/dashboard-panels'
 import { signOut } from '@/app/auth/actions'
 
 const navItems = [
@@ -61,30 +59,25 @@ interface AppSidebarProps {
 
 export function AppSidebar({ user, pendingAuditCount = 0 }: AppSidebarProps) {
   const pathname = usePathname()
-  const [collapsed, setCollapsed] = useState(false)
+  const collapsed = useSidebarCollapsed()
 
   return (
-    <aside
-      className={cn(
-        'flex flex-col h-screen bg-white border-r border-border transition-all duration-200 ease-out',
-        collapsed ? 'w-16' : 'w-64'
-      )}
-    >
-      <div className="flex items-center h-16 px-4 border-b border-border">
+    <aside className="flex flex-col h-full bg-sidebar border-r border-border overflow-hidden">
+      <div className={cn('flex items-center h-16 border-b border-border', collapsed ? 'justify-center px-2' : 'px-4')}>
         <Link href="/dashboard" className="flex items-center gap-3">
           <HourglassIcon className="h-8 w-8 text-foreground flex-shrink-0" />
           {!collapsed && (
-            <span className="font-semibold text-lg text-foreground">Hourglass</span>
+            <span className="font-semibold text-lg text-foreground whitespace-nowrap">Hourglass</span>
           )}
         </Link>
       </div>
 
-      <nav className="flex-1 py-4 px-2">
+      <nav className="flex-1 py-4 px-2 overflow-hidden">
         <ul className="flex flex-col gap-1">
           {navItems.map((item) => {
-            const isActive = pathname === item.href || 
+            const isActive = pathname === item.href ||
               (item.href !== '/dashboard' && pathname.startsWith(item.href))
-            
+
             return (
               <li key={item.href}>
                 <Link
@@ -93,7 +86,8 @@ export function AppSidebar({ user, pendingAuditCount = 0 }: AppSidebarProps) {
                     'flex items-center gap-3 px-3 py-2.5 rounded-[10px] transition-all duration-200 ease-out',
                     isActive
                       ? 'bg-primary/10 text-foreground'
-                      : 'text-muted-foreground hover:bg-hover-bg hover:text-foreground'
+                      : 'text-muted-foreground hover:bg-hover-bg hover:text-foreground',
+                    collapsed && 'justify-center px-0'
                   )}
                   title={collapsed ? item.label : undefined}
                 >
@@ -106,7 +100,7 @@ export function AppSidebar({ user, pendingAuditCount = 0 }: AppSidebarProps) {
                     )}
                   </div>
                   {!collapsed && (
-                    <span className="flex-1 text-sm font-medium">{item.label}</span>
+                    <span className="flex-1 text-sm font-medium whitespace-nowrap">{item.label}</span>
                   )}
                   {!collapsed && item.label === 'Inbox' && pendingAuditCount > 0 && (
                     <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground px-1.5 text-[11px] font-bold text-background">
@@ -136,35 +130,18 @@ export function AppSidebar({ user, pendingAuditCount = 0 }: AppSidebarProps) {
             type="submit"
             className={cn(
               'flex items-center gap-3 w-full px-3 py-2.5 rounded-[10px] text-muted-foreground hover:bg-hover-bg hover:text-foreground transition-all duration-200 ease-out',
-              collapsed && 'justify-center'
+              collapsed && 'justify-center px-0'
             )}
             title={collapsed ? 'Sign out' : undefined}
           >
             <LogOut className="h-5 w-5 flex-shrink-0" />
-            {!collapsed && <span className="text-sm font-medium">Sign out</span>}
+            {!collapsed && <span className="text-sm font-medium whitespace-nowrap">Sign out</span>}
           </button>
         </form>
       </div>
 
       <div className="border-t border-border p-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setCollapsed(!collapsed)}
-          className={cn(
-            'w-full text-muted-foreground hover:text-foreground hover:bg-hover-bg',
-            collapsed && 'justify-center'
-          )}
-        >
-          {collapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <>
-              <ChevronLeft className="h-4 w-4 mr-2" />
-              <span className="text-sm">Collapse</span>
-            </>
-          )}
-        </Button>
+        <ThemeToggle collapsed={collapsed} />
       </div>
     </aside>
   )

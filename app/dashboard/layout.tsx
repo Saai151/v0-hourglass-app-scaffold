@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { AppSidebar } from '@/components/app-sidebar'
+import { DashboardPanels } from '@/components/dashboard-panels'
 
 export default async function DashboardLayout({
   children,
@@ -29,17 +30,18 @@ export default async function DashboardLayout({
   ])
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <AppSidebar
-        user={{
-          email: user.email,
-          full_name: profile?.full_name || undefined,
-        }}
-        pendingAuditCount={pendingCount || 0}
-      />
-      <main className="flex-1 overflow-y-auto bg-background">
-        {children}
-      </main>
-    </div>
+    <DashboardPanels
+      sidebar={
+        <AppSidebar
+          user={{
+            email: user.email,
+            full_name: profile?.full_name || undefined,
+          }}
+          pendingAuditCount={pendingCount || 0}
+        />
+      }
+    >
+      {children}
+    </DashboardPanels>
   )
 }
