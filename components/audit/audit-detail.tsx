@@ -80,11 +80,11 @@ const verdictLabels: Record<Verdict, string> = {
 }
 
 const verdictColors: Record<Verdict, string> = {
-  keep: 'bg-muted text-foreground border-border',
-  shorten: 'bg-muted text-foreground border-border',
-  asyncify: 'bg-muted text-foreground border-border',
-  delegate: 'bg-muted text-foreground border-border',
-  cancel: 'bg-muted text-foreground border-border',
+  keep: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  shorten: 'bg-amber-50 text-amber-700 border-amber-200',
+  asyncify: 'bg-blue-50 text-blue-700 border-blue-200',
+  delegate: 'bg-violet-50 text-violet-700 border-violet-200',
+  cancel: 'bg-red-50 text-red-700 border-red-200',
   needs_context: 'bg-muted text-muted-foreground border-border',
 }
 
