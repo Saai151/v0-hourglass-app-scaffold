@@ -19,8 +19,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     .from('meeting_audits')
     .select(`
       *,
-      calendar_event:calendar_events(*),
-      meeting_context:meeting_contexts(*)
+      calendar_event:calendar_events(*)
     `)
     .eq('id', id)
     .eq('user_id', user.id)
@@ -30,7 +29,15 @@ export async function GET(request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: 'Audit not found' }, { status: 404 })
   }
 
-  return NextResponse.json({ audit: data })
+  // Fetch meeting context separately — the table may not exist yet
+  const { data: contextRows } = await supabase
+    .from('meeting_contexts')
+    .select('*')
+    .eq('calendar_event_id', data.calendar_event_id)
+    .eq('user_id', user.id)
+    .limit(1)
+
+  return NextResponse.json({ audit: { ...data, meeting_context: contextRows ?? [] } })
 }
 
 // PATCH /api/audits/[id] - Update audit (approve/reject)

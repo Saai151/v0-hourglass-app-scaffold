@@ -14,12 +14,19 @@ export default async function DashboardLayout({
     redirect('/auth/login')
   }
 
-  // Fetch profile for full name
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('full_name')
-    .eq('id', user.id)
-    .single()
+  // Fetch profile and pending audit count in parallel
+  const [{ data: profile }, { count: pendingCount }] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', user.id)
+      .single(),
+    supabase
+      .from('meeting_audits')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('status', 'pending'),
+  ])
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -28,6 +35,7 @@ export default async function DashboardLayout({
           email: user.email,
           full_name: profile?.full_name || undefined,
         }}
+        pendingAuditCount={pendingCount || 0}
       />
       <main className="flex-1 overflow-y-auto bg-background">
         {children}
