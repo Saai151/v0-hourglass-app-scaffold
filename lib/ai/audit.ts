@@ -1,9 +1,10 @@
 import { generateText, Output } from 'ai'
-import type { CalendarEvent, UserPreferences } from '@/lib/types'
+import type { CalendarEvent, MeetingSummary, UserPreferences } from '@/lib/types'
 import { auditModel } from './client'
 import {
   SYSTEM_PROMPT,
   formatEventForPrompt,
+  formatMeetingNotesForPrompt,
   formatPreferencesForPrompt,
 } from './prompts'
 import { meetingAuditResultSchema, type MeetingAuditResult } from './schemas'
@@ -19,9 +20,11 @@ export async function auditMeeting(
   event: CalendarEvent,
   userEmail: string | null,
   preferences: UserPreferences | null,
+  meetingSummary?: MeetingSummary | null,
 ): Promise<MeetingAuditResult> {
   const prompt =
     formatEventForPrompt(event, userEmail) +
+    formatMeetingNotesForPrompt(meetingSummary ?? null) +
     formatPreferencesForPrompt(preferences)
 
   const { output } = await generateText({

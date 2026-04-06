@@ -1,4 +1,4 @@
-import type { CalendarEvent, UserPreferences } from '@/lib/types'
+import type { CalendarEvent, MeetingSummary, UserPreferences } from '@/lib/types'
 import { format } from 'date-fns'
 
 /**
@@ -17,6 +17,7 @@ Your job: analyze a meeting and decide what should happen to it.
 - External vs internal — external meetings with clients or partners are usually harder to change.
 - Organizer — is the user the organizer or an attendee?
 - Whether a clear agenda or decision exists in the description.
+- Meeting notes or summaries from prior occurrences — past decisions, action items, and open questions are strong signals.
 
 ## Verdicts (YOU HAVE TO PICK EXACTLY ONE)
 - **keep**: The meeting is valuable as-is. Use for: critical decisions, 1:1s with reports, external client meetings, interviews.
@@ -87,5 +88,31 @@ export function formatPreferencesForPrompt(
   if (lines.length === 0) return ''
 
   return `\n\nUser preferences:\n${lines.join('\n')}`
+}
+
+/**
+ * Formats meeting notes/summaries as additional context for the audit prompt.
+ */
+export function formatMeetingNotesForPrompt(
+  summary: MeetingSummary | null,
+): string {
+  if (!summary) return ''
+
+  const sections: string[] = [
+    `\n\nMeeting notes (from prior documents):`,
+    `Summary: ${summary.summary}`,
+  ]
+
+  if (summary.decisions.length > 0) {
+    sections.push(`Decisions: ${summary.decisions.join('; ')}`)
+  }
+  if (summary.action_items.length > 0) {
+    sections.push(`Action items: ${summary.action_items.join('; ')}`)
+  }
+  if (summary.open_questions.length > 0) {
+    sections.push(`Open questions: ${summary.open_questions.join('; ')}`)
+  }
+
+  return sections.join('\n')
 }
 
