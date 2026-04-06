@@ -1,7 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-/* Point dark: variant at a class we never apply, neutralising leftover dark: utilities */
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -45,6 +44,48 @@
   --sidebar-accent: #F2F2F0;
   --sidebar-accent-foreground: #1C1B17;
   --sidebar-border: #E5E5E5;
+  --sidebar-ring: #E4F222;
+}
+
+.dark {
+  --background: #121212;
+  --foreground: #E8E8E5;
+  --card: #1A1A1A;
+  --card-foreground: #E8E8E5;
+  --popover: #1A1A1A;
+  --popover-foreground: #E8E8E5;
+  --primary: #E4F222;
+  --primary-foreground: #1C1B17;
+  --secondary: #252525;
+  --secondary-foreground: #E8E8E5;
+  --muted: #1E1E1E;
+  --muted-foreground: #9B9B9B;
+  --accent: #252525;
+  --accent-foreground: #E8E8E5;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --success: #16A34A;
+  --success-foreground: #FFFFFF;
+  --warning: #CA8A04;
+  --warning-foreground: #E8E8E5;
+  --border: #2E2E2E;
+  --input: #2E2E2E;
+  --ring: #E4F222;
+  --chart-1: #E8E8E5;
+  --chart-2: #9B9B9B;
+  --chart-3: #E4F222;
+  --chart-4: #6B6B6B;
+  --chart-5: #3A3A3A;
+  --hover-bg: #2A2A2A;
+
+  /* Dark sidebar */
+  --sidebar: #141414;
+  --sidebar-foreground: #E8E8E5;
+  --sidebar-primary: #E4F222;
+  --sidebar-primary-foreground: #1C1B17;
+  --sidebar-accent: #252525;
+  --sidebar-accent-foreground: #E8E8E5;
+  --sidebar-border: #2E2E2E;
   --sidebar-ring: #E4F222;
 }
 

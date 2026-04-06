@@ -262,7 +262,7 @@ const sidebarNav = [
 
 function DemoSidebar({ activeTab, onTabChange }: { activeTab: DemoTab; onTabChange: (tab: DemoTab) => void }) {
   return (
-    <aside className="hidden md:flex flex-col w-56 bg-white border-r border-border shrink-0">
+    <aside className="hidden md:flex flex-col w-56 bg-sidebar border-r border-border shrink-0">
       <div className="flex items-center h-14 px-4 border-b border-border">
         <div className="flex items-center gap-2.5">
           <HourglassIcon className="h-6 w-6 text-foreground flex-shrink-0" />

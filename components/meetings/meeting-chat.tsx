@@ -43,14 +43,14 @@ export function MeetingChatSidebar({ threads }: MeetingChatSidebarProps) {
   }
 
   return (
-    <aside className="hidden lg:flex w-80 border-r bg-card flex-col shrink-0">
+    <aside className="flex h-full border-r bg-card flex-col overflow-hidden">
       <div className="border-b px-5 py-4">
         <div className="flex items-center justify-between">
-          <div>
+          <div className="min-w-0">
             <h2 className="font-semibold">Chats</h2>
-            <p className="text-sm text-muted-foreground">Ask across all meeting notes</p>
+            <p className="text-sm text-muted-foreground truncate">Ask across all meeting notes</p>
           </div>
-          <Button asChild variant="outline" size="sm">
+          <Button asChild variant="outline" size="sm" className="shrink-0">
             <Link href="/dashboard/chat">
               <MessageSquarePlus className="h-4 w-4 mr-2" />
               New
@@ -69,7 +69,7 @@ export function MeetingChatSidebar({ threads }: MeetingChatSidebarProps) {
                 selectedThreadId === thread.id && 'border-foreground/20 bg-muted',
               )}
             >
-              <p className="font-medium text-sm pr-6">{thread.title}</p>
+              <p className="font-medium text-sm pr-6 truncate">{thread.title}</p>
               <p className="text-xs text-muted-foreground mt-1">
                 {formatDistanceToNow(new Date(thread.updated_at), { addSuffix: true })}
               </p>
