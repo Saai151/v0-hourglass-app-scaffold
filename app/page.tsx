@@ -116,12 +116,12 @@ export default async function HomePage() {
       <DemoVideoSection
         heading="Audit your calendar in seconds"
         description="Hourglass reviews each meeting, gathers context from emails and Slack, and delivers smart recommendations straight to your inbox."
-        videoPlaceholderLabel="Inbox & audit demo"
+        videoSrc="/Demo1.mp4"
       />
       <DemoVideoSection
         heading="Ask anything about your meetings"
         description="Upload transcripts or notes and ask questions across all your meetings. Get grounded answers with citations back to the source material."
-        videoPlaceholderLabel="Meeting chat demo"
+        videoSrc="/Demo2.mp4"
         reversed
       />
 
