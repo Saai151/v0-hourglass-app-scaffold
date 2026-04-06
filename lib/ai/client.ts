@@ -1,11 +1,14 @@
-import { groq } from '@ai-sdk/groq'
+import { createGoogleGenerativeAI } from '@ai-sdk/google'
+
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GEMINI_API_KEY,
+})
 
 /**
  * Returns the default model for Hourglass audits.
  * Change the model ID here to swap models across the entire app.
- * Reads GROQ_API_KEY from the environment automatically.
  */
-export const auditModel = groq('llama-3.3-70b-versatile')
+export const auditModel = google('gemini-2.5-flash-lite')
 
 /** Model used by the meeting chat assistant. */
-export const chatModel = groq('llama-3.3-70b-versatile')
+export const chatModel = google('gemini-2.5-flash-lite')

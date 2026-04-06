@@ -147,37 +147,62 @@ export async function POST(request: Request) {
     .join(' ')
 
   // --- Stream response ---
-  const result = streamText({
-    model: chatModel,
-    system: systemPrompt,
-    messages: await convertToModelMessages(messages),
-    tools,
-    stopWhen: stepCountIs(4),
-    onFinish: async ({ text }) => {
-      if (!text) return
+  try {
+    const result = streamText({
+      model: chatModel,
+      system: systemPrompt,
+      messages: await convertToModelMessages(messages, {
+        ignoreIncompleteToolCalls: true,
+      }),
+      tools,
+      stopWhen: stepCountIs(4),
+      onError: ({ error }) => {
+        console.error('[meeting-chat] stream error:', error)
+      },
+      onFinish: async ({ text, toolResults }) => {
+        const content =
+          text ||
+          (toolResults && toolResults.length > 0
+            ? 'I retrieved your meeting data but was unable to generate a summary. Please try asking again.'
+            : null)
 
-      await supabase.from('meeting_chat_messages').insert({
-        thread_id: thread.id,
-        user_id: user.id,
-        role: 'assistant',
-        content: text,
-        citations: [],
-        retrieval_context: { streamed: true },
-      })
+        if (!content) return
 
-      await supabase
-        .from('meeting_chat_threads')
-        .update({ updated_at: new Date().toISOString() })
-        .eq('id', thread.id)
-        .eq('user_id', user.id)
-    },
-  })
+        await supabase.from('meeting_chat_messages').insert({
+          thread_id: thread.id,
+          user_id: user.id,
+          role: 'assistant',
+          content,
+          citations: [],
+          retrieval_context: { streamed: true },
+        })
 
-  return result.toUIMessageStreamResponse({
-    messageMetadata: ({ part }) => {
-      if (part.type === 'start') {
-        return { threadId: thread.id }
-      }
-    },
-  })
+        await supabase
+          .from('meeting_chat_threads')
+          .update({ updated_at: new Date().toISOString() })
+          .eq('id', thread.id)
+          .eq('user_id', user.id)
+      },
+    })
+
+    return result.toUIMessageStreamResponse({
+      onError: (error) => {
+        console.error('[meeting-chat] response stream error:', error)
+        return error instanceof Error ? error.message : 'An error occurred'
+      },
+      messageMetadata: ({ part }) => {
+        if (part.type === 'start') {
+          return { threadId: thread.id }
+        }
+      },
+    })
+  } catch (error) {
+    console.error('[meeting-chat] route error:', error)
+    return new Response(
+      JSON.stringify({
+        error: error instanceof Error ? error.message : 'Failed to generate response',
+      }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } },
+    )
+  }
 }

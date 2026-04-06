@@ -14,15 +14,33 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Textarea } from '@/components/ui/textarea'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
-import { MessageSquarePlus, Send, Loader2, Database } from 'lucide-react'
+import { MessageSquarePlus, Send, Loader2, Database, Trash2 } from 'lucide-react'
 
 interface MeetingChatSidebarProps {
   threads: MeetingChatThread[]
 }
 
 export function MeetingChatSidebar({ threads }: MeetingChatSidebarProps) {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const selectedThreadId = searchParams.get('threadId') ?? undefined
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  async function handleDelete(e: React.MouseEvent, threadId: string) {
+    e.preventDefault()
+    e.stopPropagation()
+    setDeletingId(threadId)
+    try {
+      const res = await fetch(`/api/meetings/chat/${threadId}`, { method: 'DELETE' })
+      if (!res.ok) return
+      if (selectedThreadId === threadId) {
+        router.replace('/dashboard/chat')
+      }
+      router.refresh()
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   return (
     <aside className="hidden lg:flex w-80 border-r bg-card flex-col shrink-0">
@@ -47,17 +65,28 @@ export function MeetingChatSidebar({ threads }: MeetingChatSidebarProps) {
               key={thread.id}
               href={`/dashboard/chat?threadId=${thread.id}`}
               className={cn(
-                'block rounded-xl border p-3 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-sm',
+                'group relative block rounded-xl border p-3 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-sm',
                 selectedThreadId === thread.id && 'border-foreground/20 bg-muted',
               )}
             >
-              <p className="font-medium text-sm">{thread.title}</p>
+              <p className="font-medium text-sm pr-6">{thread.title}</p>
               <p className="text-xs text-muted-foreground mt-1">
                 {formatDistanceToNow(new Date(thread.updated_at), { addSuffix: true })}
               </p>
               <Badge variant="secondary" className="mt-2">
                 {thread.scope === 'single_meeting' ? 'Single meeting' : 'Cross meeting'}
               </Badge>
+              <button
+                onClick={(e) => handleDelete(e, thread.id)}
+                disabled={deletingId === thread.id}
+                className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+              >
+                {deletingId === thread.id ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Trash2 className="h-3.5 w-3.5" />
+                )}
+              </button>
             </Link>
           ))}
         </div>
@@ -112,7 +141,7 @@ export function MeetingChatConversation({
     [threadId, meetingId],
   )
 
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status, error, clearError } = useChat({
     id: threadId ?? undefined,
     transport,
     messages: initialMessages,
@@ -140,6 +169,7 @@ export function MeetingChatConversation({
   function handleSubmit() {
     const text = input.trim()
     if (!text || isStreaming) return
+    if (error) clearError()
     sendMessage({ text })
     setInput('')
   }
@@ -210,6 +240,26 @@ export function MeetingChatConversation({
             <Card className="bg-card">
               <CardContent className="py-4">
                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              </CardContent>
+            </Card>
+          )}
+
+          {error && (
+            <Card className="border-destructive bg-destructive/10">
+              <CardContent className="py-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-destructive">
+                    {error.message || 'Something went wrong. Please try again.'}
+                  </p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => clearError()}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    Dismiss
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}
