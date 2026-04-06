@@ -27,7 +27,7 @@ export default async function MeetingsPage() {
     <div className="flex flex-col h-full">
       <MeetingsHeader eventCount={eventCount} />
       
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-8">
         {eventCount === 0 ? (
           <MeetingsEmptyState />
         ) : (

@@ -144,14 +144,14 @@ export function IntegrationCard({ integration }: IntegrationCardProps) {
 
   return (
     <Card className={cn(
-      'transition-colors',
-      isConnected && 'border-green-200 bg-green-50/30',
-      hasError && 'border-red-200 bg-red-50/30'
+      'transition-all duration-200 ease-out',
+      isConnected && 'border-border bg-muted/30',
+      hasError && 'border-destructive/30 bg-destructive/5'
     )}>
       <CardHeader className="flex flex-row items-start gap-4">
         <div className={cn(
-          'w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0',
-          isConnected ? 'bg-green-100' : 'bg-muted'
+          'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0',
+          isConnected ? 'bg-primary/15' : 'bg-muted'
         )}>
           <Icon className="h-6 w-6" />
         </div>
@@ -172,8 +172,8 @@ export function IntegrationCard({ integration }: IntegrationCardProps) {
           <div className="flex items-center gap-2">
             {isConnected ? (
               <>
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <span className="text-sm text-green-600 font-medium">Connected</span>
+                <CheckCircle className="h-4 w-4 text-foreground" />
+                <span className="text-sm text-foreground font-medium">Connected</span>
                 {integration.connection?.email && (
                   <span className="text-sm text-muted-foreground">
                     as {integration.connection.email}
@@ -182,8 +182,8 @@ export function IntegrationCard({ integration }: IntegrationCardProps) {
               </>
             ) : hasError ? (
               <>
-                <AlertCircle className="h-4 w-4 text-red-600" />
-                <span className="text-sm text-red-600 font-medium">Connection error</span>
+                <AlertCircle className="h-4 w-4 text-destructive" />
+                <span className="text-sm text-destructive font-medium">Connection error</span>
               </>
             ) : (
               <span className="text-sm text-muted-foreground">Not connected</span>

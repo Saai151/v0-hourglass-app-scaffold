@@ -62,8 +62,8 @@ export default async function IntegrationsPage() {
     <div className="flex flex-col h-full">
       <IntegrationsHeader />
       
-      <div className="flex-1 p-6">
-        <div className="max-w-3xl mx-auto space-y-4">
+      <div className="flex-1 p-8">
+        <div className="max-w-3xl mx-auto space-y-6">
           {integrations.map(integration => (
             <IntegrationCard
               key={integration.id}

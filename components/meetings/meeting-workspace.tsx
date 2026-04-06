@@ -124,7 +124,7 @@ export function MeetingWorkspace({
 
   return (
     <div className="flex flex-col h-full">
-      <header className="border-b bg-card px-6 py-4">
+      <header className="border-b border-border bg-card px-8 py-5">
         <div className="flex items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -156,8 +156,8 @@ export function MeetingWorkspace({
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-6">
-        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+      <div className="flex-1 overflow-y-auto p-8">
+        <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="space-y-6">
             <Card>
               <CardHeader>
@@ -263,7 +263,7 @@ export function MeetingWorkspace({
                     id="document-type"
                     value={documentType}
                     onChange={(event) => setDocumentType(event.target.value as 'transcript' | 'notes')}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    className="flex h-10 w-full rounded-[10px] border border-input bg-background px-3 py-2 text-sm transition-all duration-200 ease-out focus:border-primary focus:ring-primary/30 focus:ring-[3px] outline-none"
                   >
                     <option value="transcript">Transcript</option>
                     <option value="notes">Notes</option>
