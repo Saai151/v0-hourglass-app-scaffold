@@ -22,8 +22,8 @@ AI-powered meeting ops assistant that audits your calendar, surfaces what's wast
 ## Getting started
 
 ```bash
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to see the app.
