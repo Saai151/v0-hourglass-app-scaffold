@@ -28,7 +28,7 @@ export default async function SettingsPage() {
     <div className="flex flex-col h-full">
       <SettingsHeader />
       
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-8">
         <div className="max-w-2xl mx-auto">
           <Tabs defaultValue="profile">
             <TabsList className="mb-6">

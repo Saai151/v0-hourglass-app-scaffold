@@ -115,7 +115,7 @@ export function MeetingsList({ events }: MeetingsListProps) {
 
               return (
                 <Card key={event.id} className={cn(
-                  'hover:border-primary/30 transition-colors',
+                  'hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200 ease-out',
                   isDeleting && 'opacity-50',
                 )}>
                   <CardContent className="p-4">
@@ -155,8 +155,8 @@ export function MeetingsList({ events }: MeetingsListProps) {
                             variant="outline"
                             className={cn(
                               'gap-1',
-                              audit.status === 'approved' && 'text-green-600 bg-green-50 border-green-200',
-                              audit.status === 'pending' && 'text-amber-600 bg-amber-50 border-amber-200'
+                              audit.status === 'approved' && 'text-foreground bg-muted border-border',
+                              audit.status === 'pending' && 'text-muted-foreground bg-muted border-border'
                             )}
                           >
                             {audit.status === 'approved' ? (

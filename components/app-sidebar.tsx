@@ -66,21 +66,19 @@ export function AppSidebar({ user, pendingAuditCount = 0 }: AppSidebarProps) {
   return (
     <aside
       className={cn(
-        'flex flex-col h-screen bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300',
+        'flex flex-col h-screen bg-white border-r border-border transition-all duration-200 ease-out',
         collapsed ? 'w-16' : 'w-64'
       )}
     >
-      {/* Logo */}
-      <div className="flex items-center h-16 px-4 border-b border-sidebar-border">
+      <div className="flex items-center h-16 px-4 border-b border-border">
         <Link href="/dashboard" className="flex items-center gap-3">
-          <HourglassIcon className="h-8 w-8 text-sidebar-primary flex-shrink-0" />
+          <HourglassIcon className="h-8 w-8 text-foreground flex-shrink-0" />
           {!collapsed && (
-            <span className="font-semibold text-lg">Hourglass</span>
+            <span className="font-semibold text-lg text-foreground">Hourglass</span>
           )}
         </Link>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 py-4 px-2">
         <ul className="flex flex-col gap-1">
           {navItems.map((item) => {
@@ -92,15 +90,15 @@ export function AppSidebar({ user, pendingAuditCount = 0 }: AppSidebarProps) {
                 <Link
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors',
+                    'flex items-center gap-3 px-3 py-2.5 rounded-[10px] transition-all duration-200 ease-out',
                     isActive
-                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                      : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
+                      ? 'bg-primary/10 text-foreground'
+                      : 'text-muted-foreground hover:bg-hover-bg hover:text-foreground'
                   )}
                   title={collapsed ? item.label : undefined}
                 >
                   <div className="relative flex-shrink-0">
-                    <item.icon className="h-5 w-5" />
+                    <item.icon className={cn('h-5 w-5', isActive ? 'text-foreground' : 'text-muted-foreground')} />
                     {item.label === 'Inbox' && pendingAuditCount > 0 && collapsed && (
                       <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
                         {pendingAuditCount > 9 ? '9+' : pendingAuditCount}
@@ -111,7 +109,7 @@ export function AppSidebar({ user, pendingAuditCount = 0 }: AppSidebarProps) {
                     <span className="flex-1 text-sm font-medium">{item.label}</span>
                   )}
                   {!collapsed && item.label === 'Inbox' && pendingAuditCount > 0 && (
-                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[11px] font-bold text-destructive-foreground">
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-foreground px-1.5 text-[11px] font-bold text-background">
                       {pendingAuditCount > 99 ? '99+' : pendingAuditCount}
                     </span>
                   )}
@@ -122,14 +120,13 @@ export function AppSidebar({ user, pendingAuditCount = 0 }: AppSidebarProps) {
         </ul>
       </nav>
 
-      {/* User section */}
-      <div className="border-t border-sidebar-border p-2">
+      <div className="border-t border-border p-2">
         {!collapsed && (
           <div className="px-3 py-2 mb-2">
-            <p className="text-sm font-medium truncate">
+            <p className="text-sm font-medium truncate text-foreground">
               {user.full_name || 'User'}
             </p>
-            <p className="text-xs text-sidebar-foreground/60 truncate">
+            <p className="text-xs text-muted-foreground truncate">
               {user.email}
             </p>
           </div>
@@ -138,7 +135,7 @@ export function AppSidebar({ user, pendingAuditCount = 0 }: AppSidebarProps) {
           <button
             type="submit"
             className={cn(
-              'flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors',
+              'flex items-center gap-3 w-full px-3 py-2.5 rounded-[10px] text-muted-foreground hover:bg-hover-bg hover:text-foreground transition-all duration-200 ease-out',
               collapsed && 'justify-center'
             )}
             title={collapsed ? 'Sign out' : undefined}
@@ -149,14 +146,13 @@ export function AppSidebar({ user, pendingAuditCount = 0 }: AppSidebarProps) {
         </form>
       </div>
 
-      {/* Collapse toggle */}
-      <div className="border-t border-sidebar-border p-2">
+      <div className="border-t border-border p-2">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setCollapsed(!collapsed)}
           className={cn(
-            'w-full text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50',
+            'w-full text-muted-foreground hover:text-foreground hover:bg-hover-bg',
             collapsed && 'justify-center'
           )}
         >

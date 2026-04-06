@@ -16,7 +16,7 @@ interface WeeklyTrendProps {
 const chartConfig = {
   hours: {
     label: 'Hours saved',
-    color: 'oklch(0.623 0.214 259.815)',
+    color: '#1C1B17',
   },
 } satisfies ChartConfig
 

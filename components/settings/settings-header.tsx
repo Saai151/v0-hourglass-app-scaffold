@@ -1,6 +1,6 @@
 export function SettingsHeader() {
   return (
-    <header className="border-b bg-card px-6 py-4">
+    <header className="border-b border-border bg-card px-8 py-5">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Settings</h1>

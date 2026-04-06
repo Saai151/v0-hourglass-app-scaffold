@@ -30,9 +30,9 @@ export function TimeSavedHero({ hoursSaved, meetingsActioned, meetingsAudited }:
               {meetingsAudited} audited
             </p>
           </div>
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/15">
             {hoursSaved > 0 ? (
-              <TrendingUp className="h-6 w-6 text-primary" />
+              <TrendingUp className="h-6 w-6 text-foreground" />
             ) : (
               <Clock className="h-6 w-6 text-muted-foreground" />
             )}

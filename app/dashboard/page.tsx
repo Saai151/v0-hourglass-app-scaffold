@@ -88,9 +88,9 @@ export default async function InboxPage() {
     <div className="flex flex-col h-full">
       <InboxHeader pendingCount={pendingCount} />
 
-      <div className="flex-1 p-6 space-y-6">
+      <div className="flex-1 p-8 space-y-8 animate-slide-up">
         {/* Analytics section */}
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-3">
           <TimeSavedHero
             hoursSaved={hoursSaved}
             meetingsActioned={meetingsActioned}
