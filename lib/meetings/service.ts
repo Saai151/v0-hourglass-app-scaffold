@@ -1,4 +1,4 @@
-import { generateText, Output } from 'ai'
+import { generateText } from 'ai'
 import { auditModel } from '@/lib/ai/client'
 import type {
   CalendarEvent,
@@ -89,21 +89,23 @@ export async function summarizeMeeting(
     context || 'No supporting documents provided.',
   ].join('\n')
 
-  const { output } = await generateText({
+  const { text } = await generateText({
     model: auditModel,
-    output: Output.object({ schema: meetingSummarySchema }),
     system:
-      'You summarize meeting transcripts and notes for later retrieval. Be factual, concise, and do not invent decisions or action items.',
+      'You summarize meeting transcripts and notes for later retrieval. Be factual, concise, and do not invent decisions or action items. Respond with a single JSON object: { "summary": "string", "decisions": ["string"], "action_items": ["string"], "open_questions": ["string"], "participants": ["string"] }',
     prompt,
   })
 
-  if (!output) {
-    throw new Error('Failed to generate meeting summary: no output returned')
+  const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/) || text.match(/(\{[\s\S]*\})/)
+  if (!jsonMatch) {
+    throw new Error('Failed to generate meeting summary: no JSON found in response')
   }
 
+  const object = meetingSummarySchema.parse(JSON.parse(jsonMatch[1].trim()))
+
   return {
-    ...output,
-    search_text: buildSummarySearchText(output, event),
+    ...object,
+    search_text: buildSummarySearchText(object, event),
     source_document_ids: documents.map((document) => document.id),
   }
 }

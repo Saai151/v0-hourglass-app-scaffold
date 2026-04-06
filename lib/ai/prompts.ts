@@ -34,7 +34,20 @@ Your job: analyze a meeting and decide what should happen to it.
 - Set confidence between 0.0 and 1.0: high (0.85+) for clear-cut cases, moderate (0.5–0.84) for trade-offs, low (<0.5) for guesses.
 - Risks should name what could go wrong if the recommendation is followed (0–3 items).
 - Proposed actions should be concrete steps that execute if the user approves.
-- The approval_message should be a short, friendly sentence asking the user to approve or reject.`
+- The approval_message should be a short, friendly sentence asking the user to approve or reject.
+
+## Response format
+You MUST respond with a single JSON object (no markdown, no explanation outside the JSON). Use this exact shape:
+{
+  "verdict": "keep" | "shorten" | "asyncify" | "delegate" | "cancel" | "needs_context",
+  "confidence": 0.0 to 1.0,
+  "rationale": "string explaining why",
+  "risks": ["risk1", "risk2"],
+  "draft_email": "string or null",
+  "draft_slack_message": "string or null",
+  "proposed_actions": [{ "type": "shorten|cancel|delegate|convert_async|send_email|send_slack|create_focus_block", "description": "string" }],
+  "approval_message": "string asking user to approve"
+}`
 
 /**
  * Formats a calendar event into a readable block for the prompt.

@@ -93,16 +93,21 @@ export async function POST(request: Request) {
     })
   }
 
-  // Fetch meeting summaries for events that have notes
-  const { data: summaries } = await supabase
-    .from('meeting_summaries')
-    .select('*')
-    .eq('user_id', user.id)
-    .in('calendar_event_id', eventsToAudit.map((e) => e.id))
+  // Fetch meeting summaries for events that have notes (best-effort)
+  let summaryByEvent = new Map<string, Record<string, unknown>>()
+  try {
+    const { data: summaries } = await supabase
+      .from('meeting_summaries')
+      .select('*')
+      .eq('user_id', user.id)
+      .in('calendar_event_id', eventsToAudit.map((e) => e.id))
 
-  const summaryByEvent = new Map(
-    (summaries ?? []).map((s) => [s.calendar_event_id, s])
-  )
+    summaryByEvent = new Map(
+      (summaries ?? []).map((s: Record<string, unknown>) => [s.calendar_event_id as string, s])
+    )
+  } catch {
+    // Table may not exist yet — continue without notes context
+  }
 
   // Run AI audit for each event in parallel
   const results = await Promise.allSettled(
