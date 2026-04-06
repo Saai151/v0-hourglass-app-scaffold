@@ -10,12 +10,12 @@ interface VerdictBreakdownProps {
 }
 
 const verdictConfig = {
-  cancel: { label: 'Cancel', color: 'oklch(0.577 0.245 27.325)' },
-  asyncify: { label: 'Make Async', color: 'oklch(0.623 0.214 259.815)' },
-  shorten: { label: 'Shorten', color: 'oklch(0.666 0.179 58.318)' },
-  delegate: { label: 'Delegate', color: 'oklch(0.627 0.265 303.9)' },
-  keep: { label: 'Keep', color: 'oklch(0.627 0.194 149.214)' },
-  needs_context: { label: 'Needs Context', color: 'oklch(0.551 0.027 264.364)' },
+  cancel: { label: 'Cancel', color: '#1C1B17' },
+  asyncify: { label: 'Make Async', color: '#6B6B6B' },
+  shorten: { label: 'Shorten', color: '#E4F222' },
+  delegate: { label: 'Delegate', color: '#A3A3A3' },
+  keep: { label: 'Keep', color: '#D4D4D4' },
+  needs_context: { label: 'Needs Context', color: '#E5E5E5' },
 } satisfies ChartConfig
 
 const verdictOrder: AuditVerdict[] = ['cancel', 'asyncify', 'shorten', 'delegate', 'keep', 'needs_context']

@@ -80,12 +80,12 @@ const verdictLabels: Record<Verdict, string> = {
 }
 
 const verdictColors: Record<Verdict, string> = {
-  keep: 'bg-green-100 text-green-800 border-green-200',
-  shorten: 'bg-amber-100 text-amber-800 border-amber-200',
-  asyncify: 'bg-blue-100 text-blue-800 border-blue-200',
-  delegate: 'bg-purple-100 text-purple-800 border-purple-200',
-  cancel: 'bg-red-100 text-red-800 border-red-200',
-  needs_context: 'bg-gray-100 text-gray-800 border-gray-200',
+  keep: 'bg-muted text-foreground border-border',
+  shorten: 'bg-muted text-foreground border-border',
+  asyncify: 'bg-muted text-foreground border-border',
+  delegate: 'bg-muted text-foreground border-border',
+  cancel: 'bg-muted text-foreground border-border',
+  needs_context: 'bg-muted text-muted-foreground border-border',
 }
 
 export function AuditDetail({ audit }: AuditDetailProps) {
@@ -180,7 +180,7 @@ export function AuditDetail({ audit }: AuditDetailProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <header className="border-b bg-card px-6 py-4">
+      <header className="border-b border-border bg-card px-8 py-5">
         <div className="flex items-center gap-4">
           <Button asChild variant="ghost" size="icon">
             <Link href="/dashboard">
@@ -206,7 +206,7 @@ export function AuditDetail({ audit }: AuditDetailProps) {
       </header>
 
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-4xl mx-auto p-6 space-y-6">
+          <div className="max-w-4xl mx-auto p-8 space-y-8">
           {/* Meeting Info */}
           <Card>
             <CardHeader>
@@ -265,7 +265,7 @@ export function AuditDetail({ audit }: AuditDetailProps) {
           <Card>
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-primary" />
+                <Sparkles className="h-4 w-4 text-foreground" />
                 AI Analysis
               </CardTitle>
             </CardHeader>
@@ -278,13 +278,13 @@ export function AuditDetail({ audit }: AuditDetailProps) {
               {audit.risks && audit.risks.length > 0 && (
                 <div>
                   <h4 className="text-sm font-medium mb-2 flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-amber-500" />
+                    <AlertTriangle className="h-4 w-4 text-muted-foreground" />
                     Potential Risks
                   </h4>
                   <ul className="space-y-1">
                     {audit.risks.map((risk, i) => (
                       <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
-                        <span className="text-amber-500 mt-1.5">•</span>
+                        <span className="text-muted-foreground mt-1.5">•</span>
                         {risk}
                       </li>
                     ))}
@@ -348,7 +348,7 @@ export function AuditDetail({ audit }: AuditDetailProps) {
                           onClick={() => copyToClipboard(audit.draft_email!, 'email')}
                         >
                           {copiedField === 'email' ? (
-                            <Check className="h-4 w-4 text-green-600" />
+                            <Check className="h-4 w-4 text-foreground" />
                           ) : (
                             <Copy className="h-4 w-4" />
                           )}
@@ -375,7 +375,7 @@ export function AuditDetail({ audit }: AuditDetailProps) {
                           onClick={() => copyToClipboard(audit.draft_slack_message!, 'slack')}
                         >
                           {copiedField === 'slack' ? (
-                            <Check className="h-4 w-4 text-green-600" />
+                            <Check className="h-4 w-4 text-foreground" />
                           ) : (
                             <Copy className="h-4 w-4" />
                           )}
@@ -424,7 +424,7 @@ export function AuditDetail({ audit }: AuditDetailProps) {
 
       {/* Action Bar */}
       {audit.status === 'pending' && (
-        <div className="border-t bg-card px-6 py-4">
+        <div className="border-t border-border bg-card px-8 py-4">
           <div className="max-w-4xl mx-auto flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
               {audit.approval_message || 'Do you approve this recommendation?'}

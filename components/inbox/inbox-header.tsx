@@ -9,7 +9,7 @@ interface InboxHeaderProps {
 
 export function InboxHeader({ pendingCount }: InboxHeaderProps) {
   return (
-    <header className="border-b bg-card px-6 py-4">
+    <header className="border-b border-border bg-card px-8 py-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-semibold">Inbox</h1>

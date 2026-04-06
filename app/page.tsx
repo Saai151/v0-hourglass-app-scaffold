@@ -26,11 +26,11 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b">
-        <div className="max-w-6xl mx-auto px-6 py-4">
+      <header className="border-b border-border">
+        <div className="max-w-[1100px] mx-auto px-6 py-4">
           <nav className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-              <HourglassIcon className="h-8 w-8 text-primary" />
+              <HourglassIcon className="h-8 w-8 text-foreground" />
               <span className="font-semibold text-xl">Hourglass</span>
             </Link>
             <div className="flex items-center gap-4">
@@ -46,17 +46,20 @@ export default async function HomePage() {
       </header>
 
       {/* Hero */}
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-1.5 text-sm font-medium mb-6">
+      <section className="py-28 px-6 animate-slide-up">
+        <div className="max-w-[800px] mx-auto text-center">
+          <div className="inline-flex items-center gap-2 bg-primary/15 text-foreground rounded-full px-4 py-1.5 text-sm font-medium mb-8">
             <Sparkles className="h-4 w-4" />
             AI-Powered Meeting Management
           </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-balance mb-6">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-balance mb-8">
             Reclaim your calendar with{' '}
-            <span className="text-primary">intelligent meeting ops</span>
+            <span className="relative">
+              intelligent meeting ops
+              <span className="absolute bottom-1 left-0 w-full h-3 bg-primary/30 -z-10" />
+            </span>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8 text-pretty">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10 text-pretty">
             Hourglass analyzes your meetings, suggests optimizations, and executes actions with your approval. Spend less time in unnecessary meetings.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -74,9 +77,9 @@ export default async function HomePage() {
       </section>
 
       {/* Features */}
-      <section className="py-20 px-6 bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
+      <section className="py-24 px-6">
+        <div className="max-w-[1100px] mx-auto">
+          <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4">How it works</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Hourglass connects to your calendar and communication tools to intelligently audit your meetings
@@ -104,9 +107,9 @@ export default async function HomePage() {
       </section>
 
       {/* Verdict Types */}
-      <section className="py-20 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
+      <section className="py-24 px-6">
+        <div className="max-w-[1100px] mx-auto">
+          <div className="text-center mb-16">
             <h2 className="text-3xl font-bold mb-4">Smart recommendations</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Hourglass suggests the best action for each meeting based on context and your preferences
@@ -114,43 +117,19 @@ export default async function HomePage() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <VerdictCard
-              color="green"
-              title="Keep"
-              description="Meeting is valuable and should proceed as scheduled"
-            />
-            <VerdictCard
-              color="amber"
-              title="Shorten"
-              description="Meeting could be more efficient with less time"
-            />
-            <VerdictCard
-              color="blue"
-              title="Make async"
-              description="This discussion could be handled via email or Slack"
-            />
-            <VerdictCard
-              color="purple"
-              title="Delegate"
-              description="Someone else on your team should attend instead"
-            />
-            <VerdictCard
-              color="red"
-              title="Cancel"
-              description="Meeting is not necessary and should be cancelled"
-            />
-            <VerdictCard
-              color="gray"
-              title="Needs context"
-              description="More information needed to make a recommendation"
-            />
+            <VerdictCard title="Keep" description="Meeting is valuable and should proceed as scheduled" />
+            <VerdictCard title="Shorten" description="Meeting could be more efficient with less time" />
+            <VerdictCard title="Make async" description="This discussion could be handled via email or Slack" />
+            <VerdictCard title="Delegate" description="Someone else on your team should attend instead" />
+            <VerdictCard title="Cancel" description="Meeting is not necessary and should be cancelled" />
+            <VerdictCard title="Needs context" description="More information needed to make a recommendation" />
           </div>
         </div>
       </section>
 
       {/* Trust */}
-      <section className="py-20 px-6 bg-muted/30">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="py-24 px-6">
+        <div className="max-w-[800px] mx-auto text-center">
           <div className="grid sm:grid-cols-3 gap-8">
             <TrustCard
               icon={Shield}
@@ -172,10 +151,10 @@ export default async function HomePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-6">
-        <div className="max-w-3xl mx-auto text-center">
+      <section className="py-28 px-6">
+        <div className="max-w-[700px] mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to reclaim your time?</h2>
-          <p className="text-muted-foreground mb-8">
+          <p className="text-muted-foreground mb-10">
             Join thousands of professionals who are saving hours every week with Hourglass.
           </p>
           <Button asChild size="lg" className="gap-2">
@@ -188,8 +167,8 @@ export default async function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t py-8 px-6">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+      <footer className="border-t border-border py-8 px-6">
+        <div className="max-w-[1100px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <HourglassIcon className="h-5 w-5 text-muted-foreground" />
             <span className="text-sm text-muted-foreground">
@@ -197,9 +176,9 @@ export default async function HomePage() {
             </span>
           </div>
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
-            <Link href="#" className="hover:text-foreground">Privacy</Link>
-            <Link href="#" className="hover:text-foreground">Terms</Link>
-            <Link href="#" className="hover:text-foreground">Contact</Link>
+            <Link href="#" className="hover:text-foreground transition-colors duration-200">Privacy</Link>
+            <Link href="#" className="hover:text-foreground transition-colors duration-200">Terms</Link>
+            <Link href="#" className="hover:text-foreground transition-colors duration-200">Contact</Link>
           </div>
         </div>
       </footer>
@@ -217,9 +196,9 @@ function FeatureCard({
   description: string 
 }) {
   return (
-    <div className="bg-card rounded-xl border p-6">
-      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-        <Icon className="h-6 w-6 text-primary" />
+    <div className="bg-card rounded-xl border border-border p-8 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-sm">
+      <div className="w-12 h-12 bg-primary/15 rounded-xl flex items-center justify-center mb-6">
+        <Icon className="h-6 w-6 text-foreground" />
       </div>
       <h3 className="font-semibold text-lg mb-2">{title}</h3>
       <p className="text-muted-foreground">{description}</p>
@@ -227,28 +206,20 @@ function FeatureCard({
   )
 }
 
-const colorMap: Record<string, string> = {
-  green: 'bg-green-100 text-green-700 border-green-200',
-  amber: 'bg-amber-100 text-amber-700 border-amber-200',
-  blue: 'bg-blue-100 text-blue-700 border-blue-200',
-  purple: 'bg-purple-100 text-purple-700 border-purple-200',
-  red: 'bg-red-100 text-red-700 border-red-200',
-  gray: 'bg-gray-100 text-gray-700 border-gray-200',
-}
-
 function VerdictCard({ 
-  color, 
   title, 
   description 
 }: { 
-  color: string
   title: string
   description: string 
 }) {
   return (
-    <div className={`rounded-xl border p-5 ${colorMap[color]}`}>
-      <h3 className="font-semibold mb-1">{title}</h3>
-      <p className="text-sm opacity-80">{description}</p>
+    <div className="rounded-xl border border-border p-6 bg-card transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-sm">
+      <div className="flex items-center gap-3 mb-2">
+        <span className="w-2 h-2 rounded-full bg-foreground" />
+        <h3 className="font-semibold">{title}</h3>
+      </div>
+      <p className="text-sm text-muted-foreground pl-5">{description}</p>
     </div>
   )
 }
@@ -264,8 +235,8 @@ function TrustCard({
 }) {
   return (
     <div className="text-center">
-      <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-        <Icon className="h-6 w-6 text-primary" />
+      <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+        <Icon className="h-6 w-6 text-muted-foreground" />
       </div>
       <h3 className="font-semibold mb-1">{title}</h3>
       <p className="text-sm text-muted-foreground">{description}</p>

@@ -47,8 +47,8 @@ export function MeetingChatSidebar({ threads }: MeetingChatSidebarProps) {
               key={thread.id}
               href={`/dashboard/chat?threadId=${thread.id}`}
               className={cn(
-                'block rounded-lg border p-3 transition-colors hover:border-primary/40',
-                selectedThreadId === thread.id && 'border-primary bg-primary/5',
+                'block rounded-xl border p-3 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-sm',
+                selectedThreadId === thread.id && 'border-foreground/20 bg-muted',
               )}
             >
               <p className="font-medium text-sm">{thread.title}</p>
@@ -146,7 +146,7 @@ export function MeetingChatConversation({
 
   return (
     <div className="flex-1 flex flex-col min-h-0 min-w-0">
-      <header className="border-b bg-card px-6 py-4 shrink-0">
+      <header className="border-b border-border bg-card px-8 py-5 shrink-0">
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold">{title}</h1>
@@ -171,7 +171,7 @@ export function MeetingChatConversation({
               <Card
                 key={message.id}
                 className={cn(
-                  message.role === 'assistant' ? 'bg-card' : 'bg-primary/5 border-primary/20',
+                  message.role === 'assistant' ? 'bg-card' : 'bg-muted border-border',
                 )}
               >
                 <CardHeader className="pb-3">
@@ -216,7 +216,7 @@ export function MeetingChatConversation({
         </div>
       </div>
 
-      <div className="border-t bg-card px-6 py-4 shrink-0">
+      <div className="border-t border-border bg-card px-8 py-4 shrink-0">
         <div className="max-w-4xl mx-auto space-y-3">
           <Textarea
             value={input}

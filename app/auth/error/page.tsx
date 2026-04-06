@@ -13,10 +13,10 @@ export default async function AuthErrorPage({
   const message = params.message || 'An error occurred during authentication'
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#F7F7F5] px-4">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center gap-2 mb-8">
-          <HourglassIcon className="h-12 w-12 text-primary" />
+          <HourglassIcon className="h-12 w-12 text-foreground" />
           <h1 className="text-2xl font-semibold">Hourglass</h1>
         </div>
 

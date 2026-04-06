@@ -54,38 +54,38 @@ const verdictConfig: Record<Verdict, { label: string; icon: typeof CheckCircle; 
   keep: {
     label: 'Keep',
     icon: CheckCircle,
-    color: 'text-green-600',
-    bgColor: 'bg-green-50',
+    color: 'text-foreground',
+    bgColor: 'bg-muted',
   },
   shorten: {
     label: 'Shorten',
     icon: MinusCircle,
-    color: 'text-amber-600',
-    bgColor: 'bg-amber-50',
+    color: 'text-foreground',
+    bgColor: 'bg-muted',
   },
   asyncify: {
     label: 'Make Async',
     icon: MessageSquare,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
+    color: 'text-foreground',
+    bgColor: 'bg-muted',
   },
   delegate: {
     label: 'Delegate',
     icon: UserMinus,
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-50',
+    color: 'text-foreground',
+    bgColor: 'bg-muted',
   },
   cancel: {
     label: 'Cancel',
     icon: XCircle,
-    color: 'text-red-600',
-    bgColor: 'bg-red-50',
+    color: 'text-foreground',
+    bgColor: 'bg-muted',
   },
   needs_context: {
     label: 'Needs Context',
     icon: HelpCircle,
-    color: 'text-gray-600',
-    bgColor: 'bg-gray-50',
+    color: 'text-muted-foreground',
+    bgColor: 'bg-muted',
   },
 }
 
@@ -242,8 +242,8 @@ export function InboxList({ audits }: InboxListProps) {
           <Card
             key={audit.id}
             className={cn(
-              'hover:border-primary/30 transition-colors',
-              isSelected && 'border-primary/50 bg-primary/5',
+              'hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200 ease-out',
+              isSelected && 'border-foreground/20 bg-muted',
             )}
           >
             <CardHeader className="pb-3">
