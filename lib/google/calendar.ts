@@ -2,6 +2,13 @@ import { google, type calendar_v3 } from 'googleapis'
 import type { OAuth2Client } from 'google-auth-library'
 import { addDays } from 'date-fns'
 
+export interface EventAttachment {
+  fileId: string
+  title: string
+  mimeType: string
+  fileUrl: string
+}
+
 interface TransformedEvent {
   provider_event_id: string
   title: string
@@ -12,6 +19,7 @@ interface TransformedEvent {
   end_time: string
   meeting_url: string | null
   is_external: boolean
+  attachments: EventAttachment[]
   raw_payload: Record<string, unknown>
 }
 
@@ -29,6 +37,7 @@ export async function fetchUpcomingEvents(
     singleEvents: true,
     orderBy: 'startTime',
     maxResults: 100,
+    supportsAttachments: true,
   })
 
   return (data.items || [])
@@ -60,6 +69,15 @@ function transformGoogleEvent(
     event.hangoutLink ||
     null
 
+  const attachments: EventAttachment[] = (event.attachments || [])
+    .filter((a) => a.fileId && a.title)
+    .map((a) => ({
+      fileId: a.fileId!,
+      title: a.title!,
+      mimeType: a.mimeType || '',
+      fileUrl: a.fileUrl || '',
+    }))
+
   return {
     provider_event_id: event.id!,
     title: event.summary || '(No title)',
@@ -70,6 +88,7 @@ function transformGoogleEvent(
     end_time: event.end?.dateTime || event.end?.date!,
     meeting_url: meetingUrl,
     is_external: isExternal,
+    attachments,
     raw_payload: event as unknown as Record<string, unknown>,
   }
 }

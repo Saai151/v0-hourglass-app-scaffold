@@ -70,6 +70,36 @@ export async function searchMeetingDocs(
 }
 
 /**
+ * Fetch a single Drive file's content by ID.
+ * Used to pull content from calendar event attachments.
+ */
+export async function fetchFileContent(
+  auth: OAuth2Client,
+  fileId: string,
+  mimeType: string,
+): Promise<{ title: string; content: string } | null> {
+  const drive = google.drive({ version: 'v3', auth })
+
+  try {
+    // Get file metadata
+    const { data: file } = await drive.files.get({
+      fileId,
+      fields: 'id, name, mimeType',
+    })
+
+    const content = await exportFileContent(drive, fileId, file.mimeType || mimeType)
+    if (!content) return null
+
+    return {
+      title: file.name || 'Untitled',
+      content: content.slice(0, 8000),
+    }
+  } catch {
+    return null
+  }
+}
+
+/**
  * Export a Google Workspace file as plain text.
  */
 async function exportFileContent(
